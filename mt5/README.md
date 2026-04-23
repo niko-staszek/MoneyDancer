@@ -38,15 +38,9 @@ Pyramid → Series → Basket → ScenarioD → Risk → ScenarioE →
 Dashboard → Telemetry → Signal
 ```
 
-## Deploy + compile
+## How to build
 
-From repo root:
-
-```bash
-./scripts/dev.sh
-```
-
-Mirrors `mt5/MoneyDancer/` into the MT5 terminal's `MQL5/Experts/MoneyDancer/` folder and runs MetaEditor to compile. See `../scripts/README.md` for path overrides.
+Copy `mt5/MoneyDancer/` into the MT5 terminal's data folder under `MQL5\Experts\MoneyDancer\`, open `MoneyDancer.mq5` in MetaEditor, press **F7**.
 
 ## Conventions
 
