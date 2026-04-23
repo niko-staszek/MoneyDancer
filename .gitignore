@@ -1,0 +1,8 @@
+*.ex4
+*.ex5
+*.log
+*.bak
+*.csv
+
+# Claude Code local settings — user-specific permission allowlist
+.claude/settings.local.json
