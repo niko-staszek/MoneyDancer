@@ -59,6 +59,10 @@ int OnInit()
    // Recover series IDs from open-position comments.
    SyncSeriesIdsFromOpenOrders();
 
+   // Dashboard state + rehydrate last 24h markers from history.
+   Dashboard_Init();
+   RebuildLast24hMarkers();
+
    return(INIT_SUCCEEDED);
 }
 
@@ -76,6 +80,7 @@ void OnDeinit(const int reason)
    SavePyramidToFile();
 
    SlopeDeinit();
+   CleanupDashboard();
 
    Print("MoneyDancer deinit, reason=", reason);
 }
@@ -107,14 +112,17 @@ void OnTick()
    UpdateScenarioEState();
    ScenarioE_ScanNewRunnerClosures();
 
-   // Skip new trade logic if paused.
-   if(!IsAutoPaused())
+   // Skip new trade logic if paused or operator hit STOP on dashboard.
+   if(!IsAutoPaused() && !g_eaStopped)
    {
       if(ScenarioE && HasAnyRunnersOpen())
          ManageRunnersTrailing();
 
       DetectAndHandleSignal();
    }
+
+   // Dashboard refresh (draws, stats, button polling, marker cleanup).
+   Dashboard_OnTick();
 }
 
 //+------------------------------------------------------------------+
