@@ -2,9 +2,11 @@
 
 Tick-burst grid EA with martingale basket + hedge-runner recovery. MT4 and MT5 versions live side by side in this repo.
 
+Two versions, kept as close to identical as the platforms allow:
+
 ```
-mt4/    Cleaned legacy MT4 EA    → mt4/README.md
-mt5/    MT5 port (bare, 1:1)     → mt5/README.md
+mt4/    MT4 version    → mt4/README.md
+mt5/    MT5 version    → mt5/README.md
 ```
 
 ---
@@ -17,7 +19,7 @@ mt5/    MT5 port (bare, 1:1)     → mt5/README.md
 - **Exit: basket break-even TP.** Never closes a basket manually. Instead re-levels every position's TP to the basket's weighted break-even + a few points, so one price touch closes the whole basket at once.
 - **Recovery: hedge runners (Scenario E).** If a basket gets deep underwater, opens opposite-direction "runners" that trail profit and siphon it back into the worst-losing position to drag the basket toward break-even.
 - **Daily risk layer.** Three independent kill-switches (daily profit cap, after-hour profit-protect, profit-lock floor). Any one of them flattens every position and pauses the EA until the next trading day.
-- **Two variants.** `mt4/` is the cleaned legacy MT4 EA. `mt5/` is a bare 1:1 MT5 port of that same EA — no refactoring, no new features.
+- **Two versions.** `mt4/` and `mt5/` are kept as close to identical as the platforms allow.
 
 ---
 
@@ -203,7 +205,7 @@ Opposite-direction runners that siphon profit into the losing basket.
 | `SiphonPct` | `0.90` | Fraction of closed-runner profit to siphon |
 | `MinPartialCloseLot` | `0.01` | Min lot size for a basket partial close |
 
-### Dashboard + Markers (stubs in this bare port)
+### Dashboard + Markers
 
 Present as `input`s so the legacy `.set` presets load cleanly. No visual effect in this repo.
 
@@ -239,4 +241,4 @@ Present as `input`s so the legacy `.set` presets load cleanly. No visual effect 
 ## Conventions
 
 - Risk thresholds are always **% of balance**, never fixed dollars.
-- The MT5 port is a literal 1:1 translation of `mt4/MoneyDancer_legacy.mq4`. No refactoring, no new features.
+- The MT4 and MT5 versions are kept functionally identical. Changes to one should be mirrored in the other.
