@@ -87,8 +87,12 @@ void DrawLabel(string name, int x, int y, string text, color clr, int fontSize, 
 
 void CreateButton(string name, int x, int y, int w, int h, string text, color txtClr, color bgClr)
 {
+   bool justCreated = false;
    if(ObjectFind(0, name) < 0)
+   {
       ObjectCreate(0, name, OBJ_BUTTON, 0, 0, 0);
+      justCreated = true;
+   }
 
    ObjectSetInteger(0, name, OBJPROP_CORNER, CORNER_LEFT_UPPER);
    ObjectSetInteger(0, name, OBJPROP_XDISTANCE, x);
@@ -103,7 +107,11 @@ void CreateButton(string name, int x, int y, int w, int h, string text, color tx
    ObjectSetString(0, name, OBJPROP_FONT, "Arial Bold");
    ObjectSetInteger(0, name, OBJPROP_HIDDEN, true);
    ObjectSetInteger(0, name, OBJPROP_SELECTABLE, false);
-   ObjectSetInteger(0, name, OBJPROP_STATE, false);
+
+   // Only initialise OBJPROP_STATE on first creation. DrawProDashboard calls
+   // CreateButton on every redraw; re-setting STATE to 0 here would zero out
+   // a click made between the redraw and CheckButtonClicks' poll.
+   if(justCreated) ObjectSetInteger(0, name, OBJPROP_STATE, 0);
 }
 
 void CreateBottomLabel(string name, int x, int y, int w, int h, string text, color txtClr, color bgClr)
@@ -966,8 +974,14 @@ void DrawBottomResultsPanel()
 {
    if(!ShowBottomResults) return;
 
+   // Throttle to once per second — M15 bucket data only changes per-minute at
+   // finest, so per-tick redraw is pure waste and causes flicker.
+   datetime now = TimeCurrent();
+   if(now - g_lastBottomUpdate < 1) return;
+   g_lastBottomUpdate = now;
+
    // Get current M15 index
-   int curIdx = MinutesOfDay(TimeCurrent()) / 15;
+   int curIdx = MinutesOfDay(now) / 15;
    if(curIdx < 0) curIdx = 0;
    if(curIdx > 95) curIdx = 95;
 
@@ -985,20 +999,24 @@ void DrawBottomResultsPanel()
       }
    }
 
-   // Clean old labels
-   for(int j = 0; j < 20; j++)
+   int newCount = ArraySize(validIdxs);
+
+   // Delete only slots that are no longer needed. Persisting slots get their
+   // text/colour refreshed in place by CreateBottomLabel below — so there's
+   // no delete→recreate flicker in the common case.
+   for(int j = newCount; j < 20; j++)
       DeleteObject(ObjName("BR_" + IntegerToString(j)));
 
-   if(ArraySize(validIdxs) == 0) return;
+   if(newCount == 0) return;
 
    // Draw bottom labels at chart time positions
    int labelW = 100;
    int gap    = 8;
    int yPos   = 25;
 
-   for(int k = 0; k < ArraySize(validIdxs); k++)
+   for(int k = 0; k < newCount; k++)
    {
-      int    idx = validIdxs[ArraySize(validIdxs) - 1 - k];
+      int    idx = validIdxs[newCount - 1 - k];
       double pnl = g_m15Pnl[idx];
 
       int hh = idx / 4;

@@ -166,6 +166,7 @@ int      g_aiMsgIndex         = 0;
 // Dashboard / button throttles (1-sec cooldown)
 datetime g_lastDashUpdate   = 0;
 datetime g_lastButtonCheck  = 0;
+datetime g_lastBottomUpdate = 0;
 
 // EA run-state toggle (STOP / START button)
 bool     g_eaStopped        = false;

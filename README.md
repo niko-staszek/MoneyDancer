@@ -1,10 +1,27 @@
 # MoneyDancer
 
-Bare 1:1 port of the MoneyDancer Expert Advisor from MT4 to MT5.
+Tick-burst grid EA with martingale basket + hedge-runner recovery. MT4 and MT5 versions live side by side in this repo.
+
+```
+mt4/    Cleaned legacy MT4 EA    → mt4/README.md
+mt5/    MT5 port (bare, 1:1)     → mt5/README.md
+```
 
 ---
 
-## What it is
+## How it works
+
+- **Entry: burst detector.** Waits for price to cluster at one level long enough to look like consolidation (a "burst"), then enters in the direction of the move.
+- **Adverse move: martingale (Scenario D).** If price moves against the position, scales in with a grid ladder — bigger lots further from entry, once past the first few positions.
+- **Trend confirmation: pyramid.** Optionally scales in *with* the trend too, while an EMA slope filter agrees.
+- **Exit: basket break-even TP.** Never closes a basket manually. Instead re-levels every position's TP to the basket's weighted break-even + a few points, so one price touch closes the whole basket at once.
+- **Recovery: hedge runners (Scenario E).** If a basket gets deep underwater, opens opposite-direction "runners" that trail profit and siphon it back into the worst-losing position to drag the basket toward break-even.
+- **Daily risk layer.** Three independent kill-switches (daily profit cap, after-hour profit-protect, profit-lock floor). Any one of them flattens every position and pauses the EA until the next trading day.
+- **Two variants.** `mt4/` is the cleaned legacy MT4 EA. `mt5/` is a bare 1:1 MT5 port of that same EA — no refactoring, no new features.
+
+---
+
+## What it is (detail)
 
 MoneyDancer is a **tick-burst grid EA with a martingale basket, a single-direction pyramid, and an opposite-direction hedge-runner safety layer**. It enters when the price stalls at one level long enough to look like consolidation (a "burst"), scales into the position as price moves against it (Scenario D, martingale), optionally scales in the same direction while the trend confirms (pyramiding), and — when the loss on a basket gets dangerous — opens opposite-side runners that trail a profit back and siphon it into the worst-loser to drag the basket toward break-even (Scenario E).
 
@@ -218,13 +235,6 @@ Present as `input`s so the legacy `.set` presets load cleanly. No visual effect 
 - **Cost-aware BE uses bisection.** `BasketBEWithCostsSeries` includes swap + commission and solves the BE price numerically. If the bracket doesn't bound the BE, it falls back to simple weighted-average — silent fallback.
 
 ---
-
-## Layout
-
-```
-mt4/    Cleaned legacy MT4 EA    → mt4/README.md
-mt5/    MT5 port (bare, 1:1)     → mt5/README.md
-```
 
 ## Conventions
 
