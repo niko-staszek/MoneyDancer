@@ -11,6 +11,36 @@ mt5/    MT5 version    → mt5/README.md
 
 ---
 
+## CRITICAL: Trading hours Set2 trap
+
+When restricting per-day trading hours via `XxxStart1/End1/Start2/End2`
+inputs (in `.set` files or EA Inputs dialog), **both windows must be
+explicitly configured**. If only Set1 is set and Set2 is left at defaults
+(`0:0/0:0`), **Set2 is interpreted as "24h ALLOWED"** and silently
+overrides the Set1 restriction — the EA trades all day regardless.
+
+**Why:** `IsInTimeWindow` treats `(0,0,0,0)` as 24h open, and
+`InTradingSession` ORs the two windows. A single 24h window wins.
+
+**Fix:** disable Set2 by setting `Start2 == End2` with a **non-zero** value.
+
+**Correct config for Tue 03:00-13:00 only:**
+```
+TueStart1_Hour=3    TueEnd1_Hour=13
+TueStart2_Hour=13   TueEnd2_Hour=13   # ← disables Set2 (same non-zero time)
+```
+
+**Incorrect (silently trades 24h):**
+```
+TueStart1_Hour=3    TueEnd1_Hour=13
+# Start2/End2 omitted → default 0:0/0:0 = 24h ALLOWED
+```
+
+Apply to every day you enable. Monday can be disabled wholesale via
+`MondayTrading=false` (no hour config needed).
+
+---
+
 ## How it works
 
 - **Entry: burst detector.** Waits for price to cluster at one level long enough to look like consolidation (a "burst"), then enters in the direction of the move.
