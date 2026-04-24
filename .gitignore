@@ -4,5 +4,5 @@
 *.bak
 *.csv
 
-# Claude Code local settings — user-specific permission allowlist
-.claude/settings.local.json
+# Claude Code — keep entire config out of public repo
+.claude/
