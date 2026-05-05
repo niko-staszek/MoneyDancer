@@ -1,13 +1,15 @@
 //+------------------------------------------------------------------+
-//|                                                      MoneyDancer |
+//|                                                MoneyDancer 1.1   |
 //|                                                             JoJo |
 //+------------------------------------------------------------------+
-//| Bare MT4→MT5 port (A1-A5 end state). Frozen reference — active   |
-//| development with MMD, telemetry, prop-compliance SL, etc. lives   |
-//| in the sibling CashCabaret repo.                                  |
+//| 1.1 = 1.0 bare port + Total Profit Target kill-switch.            |
+//| Adds an extra daily lock: stop trading once today's earned +      |
+//| floating P/L hits a configurable threshold (% of baseline OR      |
+//| fixed USD, selectable via dropdown in inputs / .set file).        |
+//| All other behavior identical to 1.0.                              |
 //+------------------------------------------------------------------+
 #property copyright "JoJo"
-#property version   "1.0"
+#property version   "1.1"
 #property strict
 
 #include <Trade\Trade.mqh>
@@ -38,7 +40,7 @@
 //+------------------------------------------------------------------+
 int OnInit()
 {
-   Print("MoneyDancer v1.0 init — Phase A5 (bare port)");
+   Print("MoneyDancer 1.1 init — bare port + Total Profit Target");
 
    // Configure CTrade (magic, slippage, filling mode).
    OrdersInit();

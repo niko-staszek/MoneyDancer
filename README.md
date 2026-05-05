@@ -2,12 +2,25 @@
 
 Tick-burst grid EA with martingale basket + hedge-runner recovery. MT4 and MT5 versions live side by side in this repo.
 
-Two versions, kept as close to identical as the platforms allow:
+```
+mt4/    MT4 version (single build)              → mt4/README.md
+mt5/    MT5 versioned releases (semver)         → mt5/README.md
+```
 
-```
-mt4/    MT4 version    → mt4/README.md
-mt5/    MT5 version    → mt5/README.md
-```
+## MT5 releases
+
+| Version | Status | Path                          | Notes                                                  |
+|---------|--------|-------------------------------|--------------------------------------------------------|
+| 1.0     | Frozen | `mt5/1.0/MoneyDancer_1.0/`    | Bare 1:1 MT4→MT5 port. Three daily kill-switches.      |
+| 1.1     | Active | `mt5/1.1/MoneyDancer_1.1/`    | 1.0 + Total Profit Target kill-switch (% or USD).      |
+
+Each release is self-contained (own `Include/` and `presets/`), so older versions stay buildable forever and new versions can evolve freely. Both can be deployed to the same MT5 terminal — they appear as separate EAs in Navigator.
+
+Versioning is **`MAJOR.MINOR`** (matches MQL5 Market's `#property version` format). Per-version details: [CHANGELOG.md](CHANGELOG.md).
+
+- **MAJOR** — breaking changes (new core mechanic, incompatible `.set` schema)
+- **MINOR** — additive features (new inputs default to OFF; existing `.set` files still load)
+- **FIX**   — bug fixes only, applied in-place to the MAJOR.MINOR folder; documented in CHANGELOG with a date
 
 ---
 
@@ -48,8 +61,8 @@ Apply to every day you enable. Monday can be disabled wholesale via
 - **Trend confirmation: pyramid.** Optionally scales in *with* the trend too, while an EMA slope filter agrees.
 - **Exit: basket break-even TP.** Never closes a basket manually. Instead re-levels every position's TP to the basket's weighted break-even + a few points, so one price touch closes the whole basket at once.
 - **Recovery: hedge runners (Scenario E).** If a basket gets deep underwater, opens opposite-direction "runners" that trail profit and siphon it back into the worst-losing position to drag the basket toward break-even.
-- **Daily risk layer.** Three independent kill-switches (daily profit cap, after-hour profit-protect, profit-lock floor). Any one of them flattens every position and pauses the EA until the next trading day.
-- **Two versions.** `mt4/` and `mt5/` are kept as close to identical as the platforms allow.
+- **Daily risk layer.** Independent kill-switches (daily profit cap, after-hour profit-protect, profit-lock floor; **plus total profit target in 1.1.0+**). Any one of them flattens every position and pauses the EA until the next trading day.
+- **Two platforms.** `mt4/` and `mt5/` are kept as close to identical as the platforms allow. MT5 is versioned with semver releases (`mt5/1.x.x/`); MT4 is a single legacy build.
 
 ---
 

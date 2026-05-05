@@ -1,0 +1,123 @@
+SepLic=========== LICENCJA ==========
+LicenseExpireAt=1776902399
+LicenseCode=Qap01kY632Mask3tGf3
+__sec_working_hours__=====Set Working Hours for AI====
+UseTradingHours=true
+MondayTrading=true
+MonStart1_Hour=0
+MonStart1_Minute=0
+MonEnd1_Hour=0
+MonEnd1_Minute=0
+MonStart2_Hour=0
+MonStart2_Minute=0
+MonEnd2_Hour=0
+MonEnd2_Minute=0
+TuesdayTrading=true
+TueStart1_Hour=0
+TueStart1_Minute=0
+TueEnd1_Hour=0
+TueEnd1_Minute=0
+TueStart2_Hour=0
+TueStart2_Minute=0
+TueEnd2_Hour=0
+TueEnd2_Minute=0
+WednesdayTrading=true
+WedStart1_Hour=0
+WedStart1_Minute=0
+WedEnd1_Hour=0
+WedEnd1_Minute=0
+WedStart2_Hour=0
+WedStart2_Minute=0
+WedEnd2_Hour=0
+WedEnd2_Minute=0
+ThursdayTrading=true
+ThuStart1_Hour=0
+ThuStart1_Minute=0
+ThuEnd1_Hour=0
+ThuEnd1_Minute=0
+ThuStart2_Hour=0
+ThuStart2_Minute=0
+ThuEnd2_Hour=0
+ThuEnd2_Minute=0
+FridayTrading=true
+FriStart1_Hour=0
+FriStart1_Minute=0
+FriEnd1_Hour=0
+FriEnd1_Minute=0
+FriStart2_Hour=0
+FriStart2_Minute=0
+FriEnd2_Hour=0
+FriEnd2_Minute=0
+__sec_ai_order_detection__=====AI Order Detection====
+PriceStep=0.4
+BurstTicks=10
+MinMovePoints=30
+CooldownSec=1
+MaxSpreadPts=45
+UseTickWindowFallback=true
+TickRateLookbackSec=10
+TickRateThreshold=16.0
+TickWindowTicks=20
+__sec_trend_filter__=====Filter for Trend Detection====
+UseSlopeFilter=true
+maPeriod=10
+slopeLookbackBars=9
+slopeThresholdPts=40
+strongTrendPts=70
+__sec_orders_sl_tp__=====Orders & SL & TP====
+LotsBase=0.01
+TP_Points=110
+SL_Points=5000
+Slippage=10
+Magic=21010
+__sec_higher_risk__=====Higher Risk Mode for Orders====
+ScenarioD=true
+startBe=2
+lotMultiplier=1.2
+bePoints=80
+maxLot=5.0
+MaxOrdersDir=45
+StepPoints=100
+MinOrderDistancePts=15
+__sec_gather_profits__=====Gather Profits====
+PyramRange=4
+PyramSlopeEmaPeriod=8
+PyramSlopeLookbackBars=3
+PyramSlopeAngleDeg=24.0
+PyramBEBufPts=65
+__sec_loss_control__=====Set Loss Control====
+MaxBasketDD_Pct=55.0
+MaxEquityDD_Pct=80.0
+__risk_sep__======= DAILY RISK LOCKS ======
+MaxDailyProfitPct=0
+DailyBaselineHour=1
+DailyBaselineMinute=0
+AfterThisHourCloseHour=-1
+AfterThisHourCloseMinute=0
+AfterThisHourMinProfitUsd=11111111.0
+AfterThisHourMaxFloatingLossUsd=-100.0
+RiskFromCurrentProfit=false
+RiskFromCurrentProfitUntilHour=14
+RiskFromCurrentProfitUntilMinute=30
+__sec_big_losses__=====Helper for BIG LOSSES====
+ScenarioE=true
+HedgeRatio=0.35
+RunnerBE_StartPts=120
+RunnerTrailDistPts=200
+RunnerTrailStepPts=50
+SiphonPct=0.9
+MinPartialCloseLot=0.01
+__dash_sep__======= PRO AI DASHBOARD ======
+ShowProDashboard=true
+DashboardX=20
+DashboardY=30
+DashboardWidth=420
+DashAccentColor=16748574
+DashProfitColor=65280
+DashLossColor=3937500
+__mark_sep__======= MODERN MARKERS ======
+ShowModernMarkers=true
+ShowBasketLabels=true
+ShowBottomResults=true
+BottomResultsCount=8
+MarkerArrowSize=2
