@@ -1,5 +1,8 @@
 //+------------------------------------------------------------------+
-//|                                                      MoneyDancer |
+//|                                            MoneyDancer 1.0 (MT4) |
+//+------------------------------------------------------------------+
+//| Frozen MT4 baseline. Three daily kill-switches (daily profit cap, |
+//| after-hour profit-protect, profit-lock floor). Mirrors mt5/1.0/.  |
 //+------------------------------------------------------------------+
 #property copyright "JoJo"
 #property version   "1.0"

@@ -3,18 +3,20 @@
 Tick-burst grid EA with martingale basket + hedge-runner recovery. MT4 and MT5 versions live side by side in this repo.
 
 ```
-mt4/    MT4 version (single build)              → mt4/README.md
-mt5/    MT5 versioned releases (semver)         → mt5/README.md
+mt4/    MT4 versioned releases    → mt4/README.md
+mt5/    MT5 versioned releases    → mt5/README.md
 ```
 
-## MT5 releases
+## Releases
 
-| Version | Status | Path                          | Notes                                                  |
-|---------|--------|-------------------------------|--------------------------------------------------------|
-| 1.0     | Frozen | `mt5/1.0/MoneyDancer_1.0/`    | Bare 1:1 MT4→MT5 port. Three daily kill-switches.      |
-| 1.1     | Active | `mt5/1.1/MoneyDancer_1.1/`    | 1.0 + Total Profit Target kill-switch (% or USD).      |
+Both platforms ship the same version numbers in lockstep. Each release has both an MT4 build and an MT5 build (modular).
 
-Each release is self-contained (own `Include/` and `presets/`), so older versions stay buildable forever and new versions can evolve freely. Both can be deployed to the same MT5 terminal — they appear as separate EAs in Navigator.
+| Version | Status | MT4                                | MT5                                       | Notes                                                  |
+|---------|--------|------------------------------------|-------------------------------------------|--------------------------------------------------------|
+| 1.0     | Frozen | `mt4/1.0/MoneyDancer_1.0.mq4`     | `mt5/1.0/MoneyDancer_1.0/`               | Cleaned MT4 baseline + bare 1:1 MT5 port. Three daily kill-switches. |
+| 1.1     | Active | `mt4/1.1/MoneyDancer_1.1.mq4`     | `mt5/1.1/MoneyDancer_1.1/`               | 1.0 + Total Profit Target kill-switch (% or USD).      |
+
+Each release is self-contained (its own `presets/`; on MT5 also its own `Include/`), so older versions stay buildable forever and new versions can evolve freely. All can be deployed to the same terminal — they appear as separate EAs in Navigator.
 
 Versioning is **`MAJOR.MINOR`** (matches MQL5 Market's `#property version` format). Per-version details: [CHANGELOG.md](CHANGELOG.md).
 
