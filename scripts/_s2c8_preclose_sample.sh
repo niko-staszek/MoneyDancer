@@ -30,16 +30,16 @@ run() {
     --input-override UseMMDClassifier=true --input-override RegimeTrendMode=1 \
     --input-override FridayFlattenHour=20 --input-override LotsBasePerThousand=0.002 \
     --input-override StepPoints=80 --input-override MinOrderDistancePts=60 \
-    --input-override DailyPreCloseHour=23 --input-override DailyPreCloseMinute=55 \
+    --input-override DailyPreCloseHour=22 --input-override DailyPreCloseMinute=0 \
     --input-override DailyResumeHour=1
 }
 
 # Sample of 6 priority cells
-run "PRECLOSE-5k-may25-H2" "XAUUSD.duk_robo_2025" "2025.05.15" "2025.05.30"
-run "PRECLOSE-5k-dec25-H1" "XAUUSD.duk_robo_2025" "2025.12.01" "2025.12.14"
-run "PRECLOSE-5k-apr26-H1" "XAUUSD.duk_robo"      "2026.04.01" "2026.04.14"
-run "PRECLOSE-5k-feb25-H1" "XAUUSD.duk_robo_2025" "2025.02.01" "2025.02.14"
-run "PRECLOSE-5k-mar25-H1" "XAUUSD.duk_robo_2025" "2025.03.01" "2025.03.14"
-run "PRECLOSE-5k-jan26-H1" "XAUUSD.duk_robo"      "2026.01.01" "2026.01.14"
+run "PRECLOSE22-5k-may25-H2" "XAUUSD.duk_robo_2025" "2025.05.15" "2025.05.30"
+run "PRECLOSE22-5k-dec25-H1" "XAUUSD.duk_robo_2025" "2025.12.01" "2025.12.14"
+run "PRECLOSE22-5k-apr26-H1" "XAUUSD.duk_robo"      "2026.04.01" "2026.04.14"
+run "PRECLOSE22-5k-feb25-H1" "XAUUSD.duk_robo_2025" "2025.02.01" "2025.02.14"
+run "PRECLOSE22-5k-mar25-H1" "XAUUSD.duk_robo_2025" "2025.03.01" "2025.03.14"
+run "PRECLOSE22-5k-jan26-H1" "XAUUSD.duk_robo"      "2026.01.01" "2026.01.14"
 
 echo "===== S2.C.8 sample done ====="

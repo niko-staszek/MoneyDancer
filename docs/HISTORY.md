@@ -155,11 +155,15 @@ Each row links to: commit, decision memo (`runs/decisions/`), and any relevant m
 
 - **Hypothesis**: pre-closing baskets 5 min before XAU daily-break window eliminates may25-H2's bleed-during-closed mechanism. S5.5f handles the *symptom* (rail spinning); S2.C.8 prevents the *cause* (basket open during closed pocket).
 - **Code shipped (default OFF)**: `DailyPreCloseHour`, `DailyPreCloseMinute`, `DailyResumeHour` inputs + `EnforceDailyPreClose()` in Risk.mqh, wired in OnTick after Friday flatten.
-- **Test variant**: `XAUUSD_2.0_STEP_PRECLOSE_test.set` (STEP + S2.C.8 enabled at 23:55 → resume 01:00).
-- **Sample sweep running**: 6 priority cells (may25-H2 motivating case + dec25/apr26 monsters + feb25/mar25/jan26 weak/marginal).
+- **Test variant**: `XAUUSD_2.0_STEP_PRECLOSE_test.set` (STEP + S2.C.8 enabled).
 - **Promotion gate**: may25-H2 DD < 35% AND ≥4/6 cells no regression > 30pp AND no cell DD > 40%.
 - **Commit**: `17150ff`
-- **Decision memo**: pending — `runs/decisions/2026-05-21-s2c8-daily-preclose.md` (to be written when sweep completes)
+
+**Round 1 (cutoff=23:55 UTC) — bit-identical to STEP baseline.** The function fires daily, log shows "closed 0 positions" every time. Tracing may25-H2 log: market-closed errors start at **23:xx** (165 events) and peak at **00:xx** (14,026 events) and **01:xx** (1,664 events). The 23:55 cutoff is INSIDE the broker's daily-close window — our flatten itself is rejected with "Market closed" same as basket-SL. Lesson: flatten cutoff must be EARLIER, before any close-failures begin. Trying **22:00** (right before trading-window end at 22:10) next.
+
+**Round 2 (cutoff=22:00 UTC) — in progress.** Hypothesis: any basket still open at trading-window-end is the one that runs into the closed window overnight. Flattening it before 22:10 should prevent the carry-over.
+
+**Decision memo**: pending — `runs/decisions/2026-05-21-s2c8-daily-preclose.md` (write after round 2 completes)
 
 ---
 
