@@ -161,9 +161,22 @@ Each row links to: commit, decision memo (`runs/decisions/`), and any relevant m
 
 **Round 1 (cutoff=23:55 UTC) — bit-identical to STEP baseline.** The function fires daily, log shows "closed 0 positions" every time. Tracing may25-H2 log: market-closed errors start at **23:xx** (165 events) and peak at **00:xx** (14,026 events) and **01:xx** (1,664 events). The 23:55 cutoff is INSIDE the broker's daily-close window — our flatten itself is rejected with "Market closed" same as basket-SL. Lesson: flatten cutoff must be EARLIER, before any close-failures begin. Trying **22:00** (right before trading-window end at 22:10) next.
 
-**Round 2 (cutoff=22:00 UTC) — in progress.** Hypothesis: any basket still open at trading-window-end is the one that runs into the closed window overnight. Flattening it before 22:10 should prevent the carry-over.
+**Round 2 (cutoff=22:00 UTC) — DD breach fixed, monster cells regress.**
 
-**Decision memo**: pending — `runs/decisions/2026-05-21-s2c8-daily-preclose.md` (write after round 2 completes)
+| Cell | STEP % | R2 % | R2 DD | Delta |
+|---|---|---|---|---|
+| **may25-H2** | +128.8% | +129.5% | **19.2%** | +0.7pp ✓ DD breach gone |
+| dec25-H1 | +305.8% | +229.0% | 18.1% | -76.8pp ✗ |
+| apr26-H1 | +258.4% | +101.9% | 17.9% | **-156.5pp ✗** |
+| feb25-H1 | -17.8% | -11.8% | 38.7% | +6.0pp ✓ |
+| mar25-H1 | +37.0% | +31.4% | 23.9% | -5.6pp |
+| jan26-H1 | +19.0% | +24.6% | 33.2% | +5.6pp |
+
+Sample sum R2 = +504.6% vs STEP +731.2% (-227pp). Promotion gate fails: dec25 & apr26 regress >30pp. **The flatten kills overnight monster wins** (basket still building when 22:00 hits → forced close cuts off the run). may25-H2's bleeding basket WAS open at 22:00 (trades dropped 3503 → 3330) and successfully closed before the closed window.
+
+**Round 3 (cutoff=22:00 UTC, conditional close on loss ≥ 1% equity) — in progress.** Asymmetric: only flatten *losing* baskets at the cutoff; let winning baskets run. Implementation: new input `DailyPreCloseLossThresholdPct` + per-direction `BasketFloatingPL(dir,false)` check + `CloseSeriesBasketPositions_S10` per direction if threshold met. Compiled clean.
+
+**Decision memo**: pending — `runs/decisions/2026-05-21-s2c8-daily-preclose.md` (write after round 3 completes)
 
 ---
 

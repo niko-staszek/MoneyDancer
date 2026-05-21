@@ -400,9 +400,52 @@ void EnforceDailyPreClose()
    if(!past_cutoff) return;
    if(IsAutoPaused()) return;                // already paused (S1.7, daily-loss, etc.)
 
-   int closed = CloseAllPositions();
-   PrintFormat("[S2.C.8] daily pre-close flatten: closed %d positions at %02d:%02d (cutoff=%02d:%02d)",
-               closed, mdt.hour, mdt.min, DailyPreCloseHour, DailyPreCloseMinute);
+   int closed = 0;
+
+   if(DailyPreCloseLossThresholdPct > 0.0)
+   {
+      // Conditional close: only flatten baskets whose floating loss exceeds threshold.
+      // Lets winning baskets continue capturing the overnight move while cutting off
+      // baskets that are heading into the closed-window with a deficit.
+      double eq = AccountInfoDouble(ACCOUNT_EQUITY);
+      double lossAbsThreshold = (DailyPreCloseLossThresholdPct / 100.0) * eq;
+
+      if(g_buySeriesActive)
+      {
+         double pl = BasketFloatingPL(+1, false);
+         if(pl <= -lossAbsThreshold)
+         {
+            int    sid  = CurrentSeriesId(+1);
+            string skey = SeriesKey(+1, sid);
+            int    n    = CloseSeriesBasketPositions_S10(+1, skey);
+            closed += n;
+            PrintFormat("[S2.C.8] daily pre-close: closed BUY basket n=%d pl=%.2f thr=-%.2f%%eq=-%.2f @ %02d:%02d",
+                        n, pl, DailyPreCloseLossThresholdPct, lossAbsThreshold, mdt.hour, mdt.min);
+         }
+      }
+      if(g_sellSeriesActive)
+      {
+         double pl = BasketFloatingPL(-1, false);
+         if(pl <= -lossAbsThreshold)
+         {
+            int    sid  = CurrentSeriesId(-1);
+            string skey = SeriesKey(-1, sid);
+            int    n    = CloseSeriesBasketPositions_S10(-1, skey);
+            closed += n;
+            PrintFormat("[S2.C.8] daily pre-close: closed SELL basket n=%d pl=%.2f thr=-%.2f%%eq=-%.2f @ %02d:%02d",
+                        n, pl, DailyPreCloseLossThresholdPct, lossAbsThreshold, mdt.hour, mdt.min);
+         }
+      }
+   }
+   else
+   {
+      // Unconditional close (legacy).
+      closed = CloseAllPositions();
+      PrintFormat("[S2.C.8] daily pre-close flatten: closed %d positions at %02d:%02d (cutoff=%02d:%02d)",
+                  closed, mdt.hour, mdt.min, DailyPreCloseHour, DailyPreCloseMinute);
+   }
+
+   if(closed <= 0) return;  // nothing closed — let winners run; no pause
 
    // Resume target: today at DailyResumeHour:00 if still in the future,
    // otherwise tomorrow at DailyResumeHour:00.

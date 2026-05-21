@@ -223,9 +223,12 @@ input int    FridayFlattenHour     = 0;   // S1.7 Hour 0..23 (server time) to fl
 // baskets). Empirically motivated by may25-H2's 40.48% DD breach: basket bled
 // during the ~30-min closed pocket because the rail couldn't fire. Resume at
 // DailyResumeHour the next morning. Friday is already covered by S1.7 when on.
-input int    DailyPreCloseHour     = 0;   // S2.C.8 Hour 0..23 server time to flatten daily (0=OFF; recommend 23)
-input int    DailyPreCloseMinute   = 55;  // S2.C.8 Minute 0..59 of cutoff
+input int    DailyPreCloseHour     = 0;   // S2.C.8 Hour 0..23 server time to flatten daily (0=OFF; recommend 22)
+input int    DailyPreCloseMinute   = 0;   // S2.C.8 Minute 0..59 of cutoff (recommend 0)
 input int    DailyResumeHour       = 1;   // S2.C.8 Hour server time to resume next day
+// S2.C.8 — Conditional flatten threshold. 0.0 = always close all (legacy unconditional);
+// >0.0 = only close baskets whose floating loss >= X% of equity. Lets winning baskets run.
+input double DailyPreCloseLossThresholdPct = 0.0; // S2.C.8 Close only if basket floating loss >= % equity (0=close all)
 
 // S1.1 — News-calendar blackout (default OFF; calendar inlined in NewsCalendar.mqh).
 input bool   UseNewsBlackout       = false;  // S1.1 Block new entries around calendar events
