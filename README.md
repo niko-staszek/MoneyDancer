@@ -22,6 +22,8 @@ Each release is self-contained (its own `presets/`; on MT5 also its own `Include
 
 Versioning is **`MAJOR.MINOR`** (matches MQL5 Market's `#property version` format). Per-version details: [CHANGELOG.md](CHANGELOG.md).
 
+**Research history & findings**: [docs/HISTORY.md](docs/HISTORY.md) — chronological ledger of iterations, validated facts, busted hypotheses, and open queue. Updated after every change.
+
 - **MAJOR** — breaking changes (new core mechanic, incompatible `.set` schema)
 - **MINOR** — additive features (new inputs default to OFF; existing `.set` files still load)
 - **FIX**   — bug fixes only, applied in-place to the MAJOR.MINOR folder; documented in CHANGELOG with a date

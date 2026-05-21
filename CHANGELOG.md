@@ -2,6 +2,8 @@
 
 All notable changes to MoneyDancer (MT4 + MT5) are documented here. Both platforms ship the same version numbers in lockstep.
 
+> See [docs/HISTORY.md](docs/HISTORY.md) for the full research ledger (iterations, findings, busted hypotheses, queue). CHANGELOG describes *what shipped*; HISTORY describes *why and what we learned*.
+
 Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Versioning is **`MAJOR.MINOR`** — chosen to match the format both MQL4 and MQL5 Market expect in `#property version`. Bug-fix releases (FIX bumps) edit the existing `MAJOR.MINOR` folder in place and document the fix as a sub-bullet under the same heading with a date stamp.
 
 - **MAJOR** — breaking changes (new core mechanic, incompatible `.set` schema)
