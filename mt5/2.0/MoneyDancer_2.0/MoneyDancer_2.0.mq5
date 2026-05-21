@@ -168,6 +168,9 @@ void OnTick()
    // S1.7 — Friday end-of-week flatten.
    EnforceFridayFlatten();
 
+   // S2.C.8 — Daily pre-close flatten (XAU daily-break safety).
+   EnforceDailyPreClose();
+
    // Scenario E bookkeeping + siphon-on-close.
    UpdateScenarioEState();
    ScenarioE_ScanNewRunnerClosures();

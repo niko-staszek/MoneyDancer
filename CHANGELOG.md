@@ -14,6 +14,12 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
 
 - Variants S3.2c (Pyramid-only during MMD-trend) and S3.2d (pure trend-follow) remain in plan as next iterations if WT shows live deficiencies.
 
+### Added — S2.C.8 Daily pre-close flatten (2026-05-21)
+- **New inputs** (Inputs.mqh, default OFF): `DailyPreCloseHour` (recommend 23), `DailyPreCloseMinute` (recommend 55), `DailyResumeHour` (recommend 1). Mirror of `FridayFlattenHour` but daily — closes all positions before the XAU daily-break window (~00:00 UTC), resumes next morning.
+- **`EnforceDailyPreClose()` function** (Risk.mqh) — fires once per day after `DailyPreCloseHour:DailyPreCloseMinute`, closes all positions, pauses until next day at `DailyResumeHour:00`. Skips Saturday. Defers to S1.7 Friday flatten and S1.3 daily-loss kill via the existing `IsAutoPaused()` short-circuit.
+- **`EnforceDailyPreClose()` wired in OnTick** (MoneyDancer_2.0.mq5) right after `EnforceFridayFlatten()`. Compiles clean.
+- **Motivation**: may25-H2's 40.48% DD breach happened because basket bled during the ~30-min XAU market-closed pocket where the basket-SL rail couldn't fire. S5.5f handles the *symptom* (rail spinning); S2.C.8 prevents the *cause* (basket open during the closed window). Test variant .set: `mt5/2.0/MoneyDancer_2.0/presets/XAUUSD_2.0_STEP_PRECLOSE_test.set`.
+
 ### Added — Iteration round 1 (2026-05-18)
 - **`PyramidFixedTPPts` input** (Pyramid.mqh) — when > 0, pyramid positions get a fixed TP at entry instead of legacy BUILDING (TP=0) / COASTING (TP=lastTrigger). Default 0 = legacy behavior preserved. Compiled clean.
 - **3 variants tested and rejected**: WTP (static pyramid — tester timeout), WT5 (basket SL 5% — full sweep 41% lower net than WT), WTDP (PyramidFixedTPPts=150 — dec25 DD breach 40%). See `runs/decisions/2026-05-18-iteration-round-1.md`.

@@ -379,6 +379,44 @@ void EnforceFridayFlatten()
 }
 
 //+------------------------------------------------------------------+
+//| S2.C.8 — Daily pre-close flatten + XAU daily-break pause.         |
+//| Closes everything N minutes before the broker's XAU daily-break   |
+//| window (~00:00 UTC), then pauses until DailyResumeHour the next   |
+//| day. Targets the may25-H2 mechanism where basket-SL rail couldn't |
+//| close baskets during the market-closed pocket and the basket bled |
+//| past the all-time DD ceiling. Friday is left to S1.7 when on.     |
+//+------------------------------------------------------------------+
+void EnforceDailyPreClose()
+{
+   if(DailyPreCloseHour <= 0 || DailyPreCloseHour > 23) return;
+
+   datetime now = TimeCurrent();
+   MqlDateTime mdt;
+   TimeToStruct(now, mdt);
+   if(mdt.day_of_week == 6) return;          // Saturday — broker closed
+
+   bool past_cutoff = (mdt.hour > DailyPreCloseHour) ||
+                      (mdt.hour == DailyPreCloseHour && mdt.min >= DailyPreCloseMinute);
+   if(!past_cutoff) return;
+   if(IsAutoPaused()) return;                // already paused (S1.7, daily-loss, etc.)
+
+   int closed = CloseAllPositions();
+   PrintFormat("[S2.C.8] daily pre-close flatten: closed %d positions at %02d:%02d (cutoff=%02d:%02d)",
+               closed, mdt.hour, mdt.min, DailyPreCloseHour, DailyPreCloseMinute);
+
+   // Resume target: today at DailyResumeHour:00 if still in the future,
+   // otherwise tomorrow at DailyResumeHour:00.
+   int rh = DailyResumeHour;
+   if(rh < 0) rh = 0;
+   if(rh > 23) rh = 23;
+   datetime today_resume = StringToTime(TimeToString(now, TIME_DATE) + " " +
+                                         StringFormat("%02d:00", rh));
+   datetime resume = (today_resume > now) ? today_resume : today_resume + 86400;
+   g_tradePauseUntil  = resume;
+   g_tradePauseReason = "DAILY_PRECLOSE";
+}
+
+//+------------------------------------------------------------------+
 //| S1.6 — all-time peak-to-trough drawdown trailing kill.            |
 //|                                                                   |
 //| Tracks the running max equity since EA start. When the drawdown   |

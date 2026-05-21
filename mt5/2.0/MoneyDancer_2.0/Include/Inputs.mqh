@@ -217,6 +217,16 @@ input double MaxAllTimeDDPct       = 0.0; // S1.6 All-time peak-to-trough DD % c
 // drawdowns started on a Friday and bled through the weekend.
 input int    FridayFlattenHour     = 0;   // S1.7 Hour 0..23 (server time) to flatten on Friday (0=OFF; recommend 20)
 
+// S2.C.8 — Daily pre-close flatten + XAU daily-break pause (default OFF).
+// Close every position N minutes before the XAU daily-break window (~00:00 UTC
+// where the broker reports "Market closed" and basket-SL rail cannot close
+// baskets). Empirically motivated by may25-H2's 40.48% DD breach: basket bled
+// during the ~30-min closed pocket because the rail couldn't fire. Resume at
+// DailyResumeHour the next morning. Friday is already covered by S1.7 when on.
+input int    DailyPreCloseHour     = 0;   // S2.C.8 Hour 0..23 server time to flatten daily (0=OFF; recommend 23)
+input int    DailyPreCloseMinute   = 55;  // S2.C.8 Minute 0..59 of cutoff
+input int    DailyResumeHour       = 1;   // S2.C.8 Hour server time to resume next day
+
 // S1.1 — News-calendar blackout (default OFF; calendar inlined in NewsCalendar.mqh).
 input bool   UseNewsBlackout       = false;  // S1.1 Block new entries around calendar events
 input int    NewsBlackoutPreMin    = 30;     // Minutes BEFORE the event to start blocking
