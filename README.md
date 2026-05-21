@@ -14,7 +14,9 @@ Both platforms ship the same version numbers in lockstep. Each release has both 
 | Version | Status | MT4                                | MT5                                       | Notes                                                  |
 |---------|--------|------------------------------------|-------------------------------------------|--------------------------------------------------------|
 | 1.0     | Frozen | `mt4/1.0/MoneyDancer_1.0.mq4`     | `mt5/1.0/MoneyDancer_1.0/`               | Cleaned MT4 baseline + bare 1:1 MT5 port. Three daily kill-switches. |
-| 1.1     | Active | `mt4/1.1/MoneyDancer_1.1.mq4`     | `mt5/1.1/MoneyDancer_1.1/`               | 1.0 + Total Profit Target kill-switch (% or USD).      |
+| 1.1     | Frozen | `mt4/1.1/MoneyDancer_1.1.mq4`     | `mt5/1.1/MoneyDancer_1.1/`               | 1.0 + Total Profit Target kill-switch (% or USD).      |
+| 1.2     | Frozen | _MT5-only_                        | `mt5/1.2/MoneyDancer_1.2/`               | 1.1 + initial 3 Sprint 1 rails (S1.0 basket SL + S1.6 all-time DD + S3.2 ADX regime gate); all default OFF. Bugfix backport from 2.0. |
+| 2.0     | Active | _MT5-only_                        | `mt5/2.0/MoneyDancer_2.0/`               | 1.2 + remaining Sprint 1 rails (S1.1 news / S1.2 % thresholds / S1.3 daily kill / S1.4 spread spike / S1.5 auto-LotsBase / S1.7 Friday flatten) + Sprint 2 entries (S2.0 hour-block + S3.2a MMD regime). |
 
 Each release is self-contained (its own `presets/`; on MT5 also its own `Include/`), so older versions stay buildable forever and new versions can evolve freely. All can be deployed to the same terminal — they appear as separate EAs in Navigator.
 

@@ -1,0 +1,16 @@
+; Conservative preset for tnfx.csv - MT4. 1% risk per signal.
+SignalCsvPath=disco/tnfx_processed.csv
+SymbolFilter=XAUUSD
+ExitPolicy=0
+RiskPerSignalPct=1.0
+LatencyToleranceSec=3
+SignalValidityHours=24
+DailyMaxLossPct=5.0
+MaxConcurrentPositions=10
+MaxLotCap=10.0
+MagicNumber=990001
+SymbolSuffix=
+ServerTzOffsetHours=3
+DebugMode=false
+VerboseLog=true
+Slippage=100

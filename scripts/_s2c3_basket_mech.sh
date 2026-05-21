@@ -1,0 +1,51 @@
+#!/bin/bash
+# S2.C.3 — basket completion mechanics. 3 variants × 4 cells = 12 runs.
+set +e
+SET_FILE="C:\Users\nikof\Documents\GitHub\MoneyDancer\# GOLD cap 5k dd 4100 - hard scal, mix time, range burst zone.set"
+EXPERT="MoneyDancer_2.0\MoneyDancer_2.0.ex5"
+
+run() {
+  local run_id="$1"; local symbol="$2"; local from="$3"; local to="$4"; shift 4
+  echo "===== ${run_id} ====="
+  python scripts/f0_runner.py \
+    --set-file "$SET_FILE" --run-id "$run_id" --symbol "$symbol" \
+    --from-date "$from" --to-date "$to" --deposit 5000 --expert "$EXPERT" \
+    --input-override MaxSpreadPts=100 --input-override MaxBasketLossPct=8.0 \
+    --input-override MaxBasketSLPerDay=2 --input-override MaxAllTimeDDPct=40.0 \
+    --input-override RegimeMode=2 --input-override RegimeTimeframe=15 \
+    --input-override UseMMDClassifier=true --input-override RegimeTrendMode=1 \
+    --input-override FridayFlattenHour=20 --input-override LotsBasePerThousand=0.002 \
+    "$@"
+}
+
+cells_meta() {
+  case $1 in
+    mar25) echo "XAUUSD.duk_robo_2025 2025.03.01 2025.03.14";;
+    jan26) echo "XAUUSD.duk_robo 2026.01.01 2026.01.14";;
+    dec25) echo "XAUUSD.duk_robo_2025 2025.12.01 2025.12.14";;
+    apr26) echo "XAUUSD.duk_robo 2026.04.01 2026.04.14";;
+  esac
+}
+
+# Variant 1: TIGHTER (TP=40, bePoints=40)
+for c in mar25 jan26 dec25 apr26; do
+  read sym from to <<<$(cells_meta $c)
+  run "BM-TIGHT-5k-${c}-2wk" "$sym" "$from" "$to" \
+    --input-override TP_Points=40 --input-override bePoints=40
+done
+
+# Variant 2: WIDER (TP=80, bePoints=100)
+for c in mar25 jan26 dec25 apr26; do
+  read sym from to <<<$(cells_meta $c)
+  run "BM-WIDE-5k-${c}-2wk" "$sym" "$from" "$to" \
+    --input-override TP_Points=80 --input-override bePoints=100
+done
+
+# Variant 3: STEP-TIGHTER (StepPoints=80, MinOrderDistancePts=60)
+for c in mar25 jan26 dec25 apr26; do
+  read sym from to <<<$(cells_meta $c)
+  run "BM-STEP-5k-${c}-2wk" "$sym" "$from" "$to" \
+    --input-override StepPoints=80 --input-override MinOrderDistancePts=60
+done
+
+echo "===== S2.C.3 sample done ====="

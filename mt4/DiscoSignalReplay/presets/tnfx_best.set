@@ -1,0 +1,17 @@
+; Preset for tnfx.csv on Roboforex XAUUSD - MT4
+; Backtest (Duka ticks, Python) showed +40.24% / 12d at axi/scale_out/20% risk, DD 25.48%.
+SignalCsvPath=disco/tnfx_processed.csv
+SymbolFilter=XAUUSD
+ExitPolicy=0
+RiskPerSignalPct=20.0
+LatencyToleranceSec=3
+SignalValidityHours=24
+DailyMaxLossPct=15.0
+MaxConcurrentPositions=30
+MaxLotCap=100.0
+MagicNumber=990001
+SymbolSuffix=
+ServerTzOffsetHours=3
+DebugMode=false
+VerboseLog=false
+Slippage=100

@@ -1,0 +1,25 @@
+{
+  "_comment": "Copy to telegram_poller_config.json and fill in. Real config has credentials — keep out of git.",
+
+  "api_id": 0,
+  "api_hash": "PASTE_API_HASH_FROM_my.telegram.org",
+  "_creds_help": "Get from https://my.telegram.org -> log in with phone -> API Development Tools -> Create application. api_id is an integer, api_hash is a hex string. One-time setup, free.",
+
+  "session": "telegram_poller_session",
+  "_session_help": "Telethon session file (e.g. telegram_poller_session.session). First run prompts for phone number + SMS code; subsequent runs auto-login.",
+
+  "channels": [
+    {"id": "@signal5175_channel_username_or_id", "name": "Signal#5175"},
+    {"id": "@spidey_bot_channel_username_or_id", "name": "Spidey Bot"}
+  ],
+  "_channel_help": "Each channel can be a public @username (string) or a numeric Telegram chat ID (int, often negative like -1001234567890 for channels). For private channels you're a member of, use the numeric ID — copy it from a t.me/c/<id>/<msg> URL.",
+
+  "out_csv": "C:/Users/nikof/AppData/Roaming/MetaQuotes/Terminal/17B5FF217FE004B792EFA9D824B75EEC/MQL4/Files/disco/live_inbox.csv",
+  "_out_csv_help": "Where to append parsed signals. Same format DiscoSignalReplay EA reads. Path above is Axi MT4.",
+
+  "state_file": "telegram_poller_state.json",
+  "_state_help": "Stores next 'our msg id' counter. Telethon manages its own state in the .session file separately.",
+
+  "symbol_filter": "XAUUSD",
+  "_symbol_filter_help": "Only XAUUSD signals are appended to the inbox. Set to empty string to accept all symbols (EA will then filter)."
+}

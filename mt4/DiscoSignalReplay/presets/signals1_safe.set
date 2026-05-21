@@ -1,0 +1,16 @@
+; Conservative preset for signals1.csv - MT4. 1% risk, tp1_only.
+SignalCsvPath=disco/signals1_processed.csv
+SymbolFilter=XAUUSD
+ExitPolicy=2
+RiskPerSignalPct=1.0
+LatencyToleranceSec=3
+SignalValidityHours=24
+DailyMaxLossPct=5.0
+MaxConcurrentPositions=20
+MaxLotCap=10.0
+MagicNumber=990002
+SymbolSuffix=
+ServerTzOffsetHours=3
+DebugMode=false
+VerboseLog=false
+Slippage=100

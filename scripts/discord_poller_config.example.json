@@ -1,0 +1,23 @@
+{
+  "_comment": "Copy to discord_poller_config.json and fill in. Token + channel IDs are sensitive — keep the actual file out of git (already in .gitignore-friendly name).",
+
+  "token": "PASTE_YOUR_DISCORD_USER_TOKEN_HERE",
+  "_token_help": "Browser DevTools -> Network -> any Discord API call -> Request Headers -> Authorization. NO 'Bot ' prefix for user tokens.",
+
+  "channels": [
+    {"id": "REPLACE_WITH_SIGNAL_5175_CHANNEL_ID", "name": "Signal#5175"},
+    {"id": "REPLACE_WITH_SPIDEY_BOT_CHANNEL_ID", "name": "Spidey Bot"}
+  ],
+  "_channel_help": "Right-click channel in Discord -> Copy Channel ID. Requires Developer Mode enabled (Settings -> Advanced).",
+
+  "out_csv": "C:/Users/nikof/AppData/Roaming/MetaQuotes/Terminal/17B5FF217FE004B792EFA9D824B75EEC/MQL4/Files/disco/live_inbox.csv",
+  "_out_csv_help": "Target inbox CSV in MT4/MT5 Files folder. EA will tail this file. Path above is the Axi MT4 terminal.",
+
+  "state_file": "discord_poller_state.json",
+  "_state_help": "Stores last-seen Discord message ID per channel and the next 'our msg id' counter. Safe to delete to re-pull recent history.",
+
+  "poll_interval_sec": 5,
+  "_poll_help": "5s = ~5s max latency from Discord post to EA. Discord rate limit is ~50 req/sec global; 2 channels * 1 req per cycle = 2 req per 5s = 0.4 req/sec, plenty of headroom.",
+
+  "symbol_filter": "XAUUSD"
+}
