@@ -189,9 +189,20 @@ R3 sum +453%, R2 sum +505%, STEP +731%. **R3 conditional is worse than R2 uncond
 
 Diagnosis: monster baskets aren't "in profit" at 22:00 — they're mid-build with floating losses while waiting for retraces. The 1% threshold catches them. Unconditional flatten locks in whatever mid-state P&L; conditional leaves the basket open and it goes through deeper dips before reverting. The "let winners run" mental model doesn't apply because at 22:00 there are rarely "winners" to spare.
 
-**Round 4 (cutoff=22:00 UTC, conditional ≥4% equity) — in progress.** Higher threshold = only catch deeply underwater baskets (halfway to basket-SL=8% trigger). Hypothesis: monster baskets transient dips don't reach -4%, so monsters preserved; may25-H2's bleeding basket already past -4% at 22:00 still caught.
+**Round 4 (cutoff=22:00 UTC, conditional ≥4%) — partial fix; cell-specific.**
 
-**Decision memo**: pending — `runs/decisions/2026-05-21-s2c8-daily-preclose.md` (write after round 4)
+| Cell | STEP | R4@4% | R4 DD | Delta |
+|---|---|---|---|---|
+| may25-H2 | +128.8% | +117.5% | **25.4%** ✓ | -11.3pp |
+| dec25-H1 | +305.8% | **+320.4%** | 18.1% | **+14.6pp ✓** |
+| apr26-H1 | +258.4% | +122.2% | 17.9% | **-136.2pp ✗** |
+| feb25-H1 | -17.8% | -12.4% | 38.2% | +5.4pp ✓ |
+
+Trade counts: dec25 4216 → 4207 (almost unchanged), apr26 5096 → 4292 (-800 trades). So 4% threshold barely fires on dec25 but fires often on apr26. apr26 has nights with deep transient dips that would have recovered. dec25 doesn't. **The asymmetric mechanic works for some cells but not others — cell-specific.**
+
+**Round 5 (cutoff=22:00 UTC, conditional ≥6%) — in progress.** Only catches baskets within 2pp of basket-SL trigger (8%). Hypothesis: at -6%, basket is genuinely about to die anyway, so closing it pre-emptively only matters during the closed window (i.e., catches exactly the may25-H2 mechanism without false-positives on monster builds).
+
+**Decision memo**: pending — `runs/decisions/2026-05-22-s2c8-daily-preclose.md` (write after round 5)
 
 ---
 
