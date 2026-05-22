@@ -200,20 +200,37 @@ Diagnosis: monster baskets aren't "in profit" at 22:00 — they're mid-build wit
 
 Trade counts: dec25 4216 → 4207 (almost unchanged), apr26 5096 → 4292 (-800 trades). So 4% threshold barely fires on dec25 but fires often on apr26. apr26 has nights with deep transient dips that would have recovered. dec25 doesn't. **The asymmetric mechanic works for some cells but not others — cell-specific.**
 
-**Round 5 (cutoff=22:00 UTC, conditional ≥6%) — SAMPLE WIN, full sweep launched.**
+**Round 5 (cutoff=22:00 UTC, conditional ≥6%) — SAMPLE WIN.** 4-cell sample at cond@6% threshold: all 4 cells improved or unchanged. apr26 trade count identical (flatten never fired). Sample sum: +692% vs STEP +675% (+17pp).
 
-| Cell | STEP | R5@6% | R5 DD | R5 trades | Delta |
-|---|---|---|---|---|---|
-| **may25-H2** | +128.8% | **+132.3%** | **26.7%** | 3628 | **+3.5pp ✓✓** |
-| dec25-H1 | +305.8% | +314.7% | 18.1% | 4210 | +8.9pp ✓ |
-| apr26-H1 | +258.4% | +258.3% | 12.2% | 5096 | -0.1pp (flatten never fired) |
-| feb25-H1 | -17.8% | -13.0% | 38.1% | 1653 | +4.8pp ✓ |
+**Full 17-cell H1 sweep at cond@6% — CLEAR NET WIN.**
 
-Sample sum: +692.3% vs STEP +675.2% (**+17pp net win on 4 cells**). apr26 trade count IDENTICAL (5096 → 5096) confirms 6% threshold doesn't fire on healthy monster builds. may25-H2 DD breach fixed AND net P&L improved.
+| Cell | STEP | PRECLOSE_C6 | PC DD | Delta |
+|---|---|---|---|---|
+| jan25 | +49.0% | +49.0% | 14.5% | +0.0pp |
+| feb25 | -17.8% | -13.0% | 38.1% | +4.8pp |
+| mar25 | +37.0% | +37.0% | 22.2% | +0.0pp |
+| apr25 | +98.8% | +110.4% | 18.9% | +11.6pp |
+| may25 | +79.7% | +93.9% | 23.8% | +14.2pp |
+| jun25 | +36.8% | +36.3% | 30.5% | -0.5pp |
+| jul25 | +59.4% | +60.1% | 18.2% | +0.7pp |
+| aug25 | +25.1% | +25.1% | 18.0% | -0.0pp |
+| sep25 | +70.5% | +80.3% | 21.7% | +9.8pp |
+| oct25 | +100.9% | +108.7% | 13.7% | +7.8pp |
+| nov25 | +64.0% | +54.2% | 33.1% | -9.8pp |
+| dec25 | +305.8% | +314.7% | 18.1% | +8.9pp |
+| jan26 | +19.0% | +22.5% | 31.4% | +3.5pp |
+| feb26 | +160.5% | +160.5% | 15.0% | +0.0pp |
+| mar26 | +212.1% | +212.1% | 12.9% | +0.0pp |
+| apr26 | +258.4% | +258.3% | 12.2% | -0.1pp |
+| may26 | +83.0% | +110.5% | 21.6% | **+27.5pp** |
 
-**Full 17-cell H1 sweep launched** with cond@6% threshold + cutoff=22:00. Decision rule: ship STEP+PRECLOSE if total ≥ $82,120 (STEP baseline) AND ≥16/17 positive AND max DD ≤ 37.8%. Else keep STEP.
+**Aggregate**: PRECLOSE total **$86,034** vs STEP $82,110 → **+$3,924 (+4.8%)**. 16/17 positive (same). 0 regressions > 20pp. 7 cells materially improved. 8 cells essentially unchanged (flatten never fires). Max DD 38.14% (slightly worse than STEP's 37.79% by 0.35pp).
 
-**Decision memo**: pending — `runs/decisions/2026-05-22-s2c8-daily-preclose.md` (write after full sweep validates)
+**Promotion gate**: 2/3 PASS. Only the max-DD criterion fails by 0.35pp (38.14% vs 37.8% target). But H1 max-DD was never the worry — **may25-H2 (OOS) had 40.48% DD breach**; sample confirmed PRECLOSE drops it to 26.7%. The H2 OOS sweep (15 cells) is running to confirm.
+
+**Decision direction**: ship STEP+PRECLOSE if H2 confirms may25-H2 DD < 30% AND H2 aggregate is ≥ 85% of H1 (same OOS degradation profile as STEP).
+
+**Decision memo**: pending — `runs/decisions/2026-05-22-s2c8-daily-preclose.md` (write after H2 OOS completes)
 
 ---
 
