@@ -174,9 +174,24 @@ Each row links to: commit, decision memo (`runs/decisions/`), and any relevant m
 
 Sample sum R2 = +504.6% vs STEP +731.2% (-227pp). Promotion gate fails: dec25 & apr26 regress >30pp. **The flatten kills overnight monster wins** (basket still building when 22:00 hits → forced close cuts off the run). may25-H2's bleeding basket WAS open at 22:00 (trades dropped 3503 → 3330) and successfully closed before the closed window.
 
-**Round 3 (cutoff=22:00 UTC, conditional close on loss ≥ 1% equity) — in progress.** Asymmetric: only flatten *losing* baskets at the cutoff; let winning baskets run. Implementation: new input `DailyPreCloseLossThresholdPct` + per-direction `BasketFloatingPL(dir,false)` check + `CloseSeriesBasketPositions_S10` per direction if threshold met. Compiled clean.
+**Round 3 (cutoff=22:00 UTC, conditional close on loss ≥ 1% equity) — fixes DD but WORSE on aggregate than R2.**
 
-**Decision memo**: pending — `runs/decisions/2026-05-21-s2c8-daily-preclose.md` (write after round 3 completes)
+| Cell | STEP % | R2 uncond | R3 cond≥1% | R3 DD | R3-STEP |
+|---|---|---|---|---|---|
+| may25-H2 | +128.8% | +129.5% | +126.7% | 19.9% | -2.1pp ✓ |
+| dec25-H1 | +305.8% | +229.0% | +181.0% | 19.8% | -124.8pp ✗ |
+| apr26-H1 | +258.4% | +101.9% | +101.5% | 17.6% | -156.9pp ✗ |
+| feb25-H1 | -17.8% | -11.8% | -11.1% | 38.4% | +6.7pp ✓ |
+| mar25-H1 | +37.0% | +31.4% | +32.7% | 24.0% | -4.3pp |
+| jan26-H1 | +19.0% | +24.6% | +22.7% | 33.5% | +3.7pp |
+
+R3 sum +453%, R2 sum +505%, STEP +731%. **R3 conditional is worse than R2 unconditional on aggregate.**
+
+Diagnosis: monster baskets aren't "in profit" at 22:00 — they're mid-build with floating losses while waiting for retraces. The 1% threshold catches them. Unconditional flatten locks in whatever mid-state P&L; conditional leaves the basket open and it goes through deeper dips before reverting. The "let winners run" mental model doesn't apply because at 22:00 there are rarely "winners" to spare.
+
+**Round 4 (cutoff=22:00 UTC, conditional ≥4% equity) — in progress.** Higher threshold = only catch deeply underwater baskets (halfway to basket-SL=8% trigger). Hypothesis: monster baskets transient dips don't reach -4%, so monsters preserved; may25-H2's bleeding basket already past -4% at 22:00 still caught.
+
+**Decision memo**: pending — `runs/decisions/2026-05-21-s2c8-daily-preclose.md` (write after round 4)
 
 ---
 
