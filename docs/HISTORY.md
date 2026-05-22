@@ -200,9 +200,20 @@ Diagnosis: monster baskets aren't "in profit" at 22:00 — they're mid-build wit
 
 Trade counts: dec25 4216 → 4207 (almost unchanged), apr26 5096 → 4292 (-800 trades). So 4% threshold barely fires on dec25 but fires often on apr26. apr26 has nights with deep transient dips that would have recovered. dec25 doesn't. **The asymmetric mechanic works for some cells but not others — cell-specific.**
 
-**Round 5 (cutoff=22:00 UTC, conditional ≥6%) — in progress.** Only catches baskets within 2pp of basket-SL trigger (8%). Hypothesis: at -6%, basket is genuinely about to die anyway, so closing it pre-emptively only matters during the closed window (i.e., catches exactly the may25-H2 mechanism without false-positives on monster builds).
+**Round 5 (cutoff=22:00 UTC, conditional ≥6%) — SAMPLE WIN, full sweep launched.**
 
-**Decision memo**: pending — `runs/decisions/2026-05-22-s2c8-daily-preclose.md` (write after round 5)
+| Cell | STEP | R5@6% | R5 DD | R5 trades | Delta |
+|---|---|---|---|---|---|
+| **may25-H2** | +128.8% | **+132.3%** | **26.7%** | 3628 | **+3.5pp ✓✓** |
+| dec25-H1 | +305.8% | +314.7% | 18.1% | 4210 | +8.9pp ✓ |
+| apr26-H1 | +258.4% | +258.3% | 12.2% | 5096 | -0.1pp (flatten never fired) |
+| feb25-H1 | -17.8% | -13.0% | 38.1% | 1653 | +4.8pp ✓ |
+
+Sample sum: +692.3% vs STEP +675.2% (**+17pp net win on 4 cells**). apr26 trade count IDENTICAL (5096 → 5096) confirms 6% threshold doesn't fire on healthy monster builds. may25-H2 DD breach fixed AND net P&L improved.
+
+**Full 17-cell H1 sweep launched** with cond@6% threshold + cutoff=22:00. Decision rule: ship STEP+PRECLOSE if total ≥ $82,120 (STEP baseline) AND ≥16/17 positive AND max DD ≤ 37.8%. Else keep STEP.
+
+**Decision memo**: pending — `runs/decisions/2026-05-22-s2c8-daily-preclose.md` (write after full sweep validates)
 
 ---
 
