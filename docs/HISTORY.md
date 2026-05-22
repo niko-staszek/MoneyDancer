@@ -22,9 +22,9 @@ Canonical, append-only ledger of changes, decisions and findings. **Update this 
 
 | ID | Description | Status | Task # |
 |---|---|---|---|
-| S2.C.8 | Daily pre-close flatten (XAU daily-break safety) | in-progress (sample running) | #46 |
+| S2.C.8 | Daily pre-close flatten — INVESTIGATED, NOT SHIPPED | completed (busted on H2 OOS) | #46 |
 | S2.C.9 | Per-DOW × per-regime hour P&L map | planned | #47 |
-| S2.C.4 | Martingale shape sample (startBe=3, MaxOrdersDir=30) | designed, never run | #48 |
+| S2.C.4 | Martingale shape sample (startBe=3, MaxOrdersDir=30) | **in-progress** | #48 |
 | S3.2c | PYRAMID_ONLY during MMD-trend | designed, never tested | #49 |
 | S3.2d | PURE_TREND_FOLLOW (stretch) | parked | #50 |
 | S5.5b | Max-lot ceiling discovery per broker | research | #20 |
@@ -230,7 +230,35 @@ Trade counts: dec25 4216 → 4207 (almost unchanged), apr26 5096 → 4292 (-800 
 
 **Decision direction**: ship STEP+PRECLOSE if H2 confirms may25-H2 DD < 30% AND H2 aggregate is ≥ 85% of H1 (same OOS degradation profile as STEP).
 
-**Decision memo**: pending — `runs/decisions/2026-05-22-s2c8-daily-preclose.md` (write after H2 OOS completes)
+**H2 OOS sweep (15 cells, jan26-H2 re-running) — REVERSES THE H1 WIN.**
+
+| Cell | STEP H2 | PRECLOSE H2 | Delta |
+|---|---|---|---|
+| **may25-H2** | +129.8% @ **40.5% DD** | +132.3% @ **26.7% DD** | DD breach FIXED + small gain |
+| apr25-H2 | +150.1% | +162.3% | +12.2pp ✓ |
+| sep25-H2 | +40.5% | +66.7% | +26.3pp ✓ |
+| oct25-H2 | +64.1% | +66.7% | +2.6pp ✓ |
+| jun25-H2 | +10.1% | -0.0% | -10.2pp |
+| nov25-H2 | +228.6% | +217.6% | -11.0pp |
+| **mar26-H2** | **+124.2%** | **+69.9%** | **-54.3pp ✗** |
+| 9 other cells | — | — | unchanged (flatten didn't fire) |
+
+**H2 totals (15 cells)**: STEP $66,346 vs PRECLOSE $56,360 → **PRECLOSE LOSES $9,986 on OOS**.
+
+**Combined 31-cell picture**: STEP $148,456 vs PRECLOSE $142,394 = PRECLOSE -$6,062. Net loss.
+
+**Classic OOS overfit detection.** The H1 win was specific to first-half basket dynamics. mar26-H2 has nights where baskets transiently dip below -6% then recover for monster wins; PRECLOSE flatten cuts them off (-$2,715 on one cell alone). The same -6% threshold that worked perfectly on H1 mar26 (+0.0pp delta) destroys H2 mar26.
+
+**Lesson**: even a conservatively-tuned static threshold doesn't survive OOS. Basket-build-vs-recovery dynamics differ by 2-week window in ways unpredictable from aggregate features (re-confirms the round-4 path-dependence finding).
+
+### DECISION: drop S2.C.8 from ship. STEP stays ship.
+
+- ✓ may25-H2 architectural DD (40.48%) is a known weakness — accepted as-is for now
+- ✓ S5.5f remains shipped (code hygiene, fixes the rail-spin log spam during the same window)
+- ✗ S2.C.8 daily pre-close NOT shipped — code stays in EA defaults OFF for future re-investigation
+- ✗ `XAUUSD_2.0_STEP_PRECLOSE_ship.set` NOT promoted — kept as a documented variant in `presets/` for users who prioritize DD ceiling over total profit (15% DD reduction on may25-H2, $6k aggregate cost)
+
+**Decision memo**: `runs/decisions/2026-05-22-s2c8-daily-preclose.md` to write up the failure.
 
 ---
 
@@ -273,6 +301,7 @@ Things tested enough to bet on:
 | "Adaptive MinMove (continuous scaling)" | Helps extremes (jan26 +99pp) but breaks marginals (mar25 -25pp). Linear/inverse function is wrong shape — needs step function on ATR percentile | Round 2 |
 | "MMD adverse-side gates (Block D / E)" | Conditions almost never fire under WT (basket already direction-filtered) | Round 4 Opt2/3 |
 | "Bidirectional regime-aware basket SL (8/12/4)" | TrendWith too loose, TrendAgainst clips monster captures | Round 4 Opt1 |
+| "Daily pre-close flatten before XAU break (S2.C.8)" | H1 won (+$3.9k) but H2 OOS lost $10k. Static loss threshold doesn't generalize — mar26-H2 alone -$2,715 from forfeited monster builds. The cure costs more than the disease. | S2.C.8 R1-R6 (2026-05-21/22) |
 
 ---
 
