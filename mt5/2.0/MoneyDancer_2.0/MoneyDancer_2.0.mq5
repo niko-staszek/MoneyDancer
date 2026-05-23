@@ -45,6 +45,7 @@
 #include "Include/Utils.mqh"
 #include "Include/Persistence.mqh"
 #include "Include/RailStatePersist.mqh"
+#include "Include/SymbolSpec.mqh"
 #include "Include/Orders.mqh"
 #include "Include/Slope.mqh"
 #include "Include/MMD.mqh"
@@ -67,6 +68,18 @@
 int OnInit()
 {
    Print("MoneyDancer 2.0 init — Sprint 1 rails + Sprint 2 entry");
+
+   // PL.3 — verify broker symbol spec before doing anything else.
+   // Aborts init if XAU contract_size / vol_min/step / digits / tradeable are unexpected.
+   // Tester is exempt (custom symbols may have non-standard specs by design).
+   if(!MQLInfoInteger(MQL_TESTER))
+   {
+      if(!VerifySymbolSpec())
+      {
+         Print("[PL.3] aborting OnInit due to symbol-spec failure");
+         return(INIT_FAILED);
+      }
+   }
 
    // Configure CTrade (magic, slippage, filling mode).
    OrdersInit();

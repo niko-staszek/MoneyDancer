@@ -35,6 +35,114 @@ void OrdersInit()
 }
 
 //+------------------------------------------------------------------+
+//| PL.2 — broker-realism error handling                              |
+//|                                                                   |
+//| Decodes MT5 trade retcodes into human-readable strings and        |
+//| classifies them as RETRYABLE (transient quote issues — worth      |
+//| trying again next tick) vs TERMINAL (broker rejects the action — |
+//| no point retrying).                                                |
+//+------------------------------------------------------------------+
+string TradeRetcodeString(uint code)
+{
+   switch(code)
+   {
+      case TRADE_RETCODE_DONE:                return "DONE";
+      case TRADE_RETCODE_DONE_PARTIAL:        return "DONE_PARTIAL";
+      case TRADE_RETCODE_PLACED:              return "PLACED";
+      case TRADE_RETCODE_REQUOTE:             return "REQUOTE";
+      case TRADE_RETCODE_REJECT:              return "REJECT";
+      case TRADE_RETCODE_CANCEL:              return "CANCEL";
+      case TRADE_RETCODE_ERROR:               return "ERROR";
+      case TRADE_RETCODE_TIMEOUT:             return "TIMEOUT";
+      case TRADE_RETCODE_INVALID:             return "INVALID";
+      case TRADE_RETCODE_INVALID_VOLUME:      return "INVALID_VOLUME";
+      case TRADE_RETCODE_INVALID_PRICE:       return "INVALID_PRICE";
+      case TRADE_RETCODE_INVALID_STOPS:       return "INVALID_STOPS";
+      case TRADE_RETCODE_TRADE_DISABLED:      return "TRADE_DISABLED";
+      case TRADE_RETCODE_MARKET_CLOSED:       return "MARKET_CLOSED";
+      case TRADE_RETCODE_NO_MONEY:            return "NO_MONEY";
+      case TRADE_RETCODE_PRICE_CHANGED:       return "PRICE_CHANGED";
+      case TRADE_RETCODE_PRICE_OFF:           return "PRICE_OFF";
+      case TRADE_RETCODE_INVALID_EXPIRATION:  return "INVALID_EXPIRATION";
+      case TRADE_RETCODE_ORDER_CHANGED:       return "ORDER_CHANGED";
+      case TRADE_RETCODE_TOO_MANY_REQUESTS:   return "TOO_MANY_REQUESTS";
+      case TRADE_RETCODE_NO_CHANGES:          return "NO_CHANGES";
+      case TRADE_RETCODE_SERVER_DISABLES_AT:  return "SERVER_DISABLES_AT";
+      case TRADE_RETCODE_CLIENT_DISABLES_AT:  return "CLIENT_DISABLES_AT";
+      case TRADE_RETCODE_LOCKED:              return "LOCKED";
+      case TRADE_RETCODE_FROZEN:              return "FROZEN";
+      case TRADE_RETCODE_INVALID_FILL:        return "INVALID_FILL";
+      case TRADE_RETCODE_CONNECTION:          return "CONNECTION";
+      case TRADE_RETCODE_ONLY_REAL:           return "ONLY_REAL";
+      case TRADE_RETCODE_LIMIT_ORDERS:        return "LIMIT_ORDERS";
+      case TRADE_RETCODE_LIMIT_VOLUME:        return "LIMIT_VOLUME";
+      case TRADE_RETCODE_INVALID_ORDER:       return "INVALID_ORDER";
+      case TRADE_RETCODE_POSITION_CLOSED:     return "POSITION_CLOSED";
+      case TRADE_RETCODE_INVALID_CLOSE_VOLUME:return "INVALID_CLOSE_VOLUME";
+      case TRADE_RETCODE_CLOSE_ORDER_EXIST:   return "CLOSE_ORDER_EXIST";
+      case TRADE_RETCODE_LIMIT_POSITIONS:     return "LIMIT_POSITIONS";
+      case TRADE_RETCODE_REJECT_CANCEL:       return "REJECT_CANCEL";
+      case TRADE_RETCODE_LONG_ONLY:           return "LONG_ONLY";
+      case TRADE_RETCODE_SHORT_ONLY:          return "SHORT_ONLY";
+      case TRADE_RETCODE_CLOSE_ONLY:          return "CLOSE_ONLY";
+      case TRADE_RETCODE_FIFO_CLOSE:          return "FIFO_CLOSE";
+      default:                                return StringFormat("CODE_%u", code);
+   }
+}
+
+// Retryable: transient quote issues; the rail's per-tick retry will resolve.
+// Terminal: broker rejects the action; no point retrying, surface to operator.
+bool IsRetcodeRetryable(uint code)
+{
+   switch(code)
+   {
+      case TRADE_RETCODE_REQUOTE:
+      case TRADE_RETCODE_PRICE_CHANGED:
+      case TRADE_RETCODE_PRICE_OFF:
+      case TRADE_RETCODE_TIMEOUT:
+      case TRADE_RETCODE_TOO_MANY_REQUESTS:
+      case TRADE_RETCODE_CONNECTION:
+      case TRADE_RETCODE_NO_CHANGES:        // unchanged value — caller should skip
+         return true;
+      default:
+         return false;
+   }
+}
+
+// Terminal errors that should pause the EA — broker says this account can't trade.
+bool IsRetcodeTerminal(uint code)
+{
+   switch(code)
+   {
+      case TRADE_RETCODE_TRADE_DISABLED:
+      case TRADE_RETCODE_NO_MONEY:
+      case TRADE_RETCODE_SERVER_DISABLES_AT:
+      case TRADE_RETCODE_CLIENT_DISABLES_AT:
+      case TRADE_RETCODE_LIMIT_POSITIONS:
+      case TRADE_RETCODE_LIMIT_VOLUME:
+      case TRADE_RETCODE_LIMIT_ORDERS:
+         return true;
+      default:
+         return false;
+   }
+}
+
+// Log a trade failure with context.  Caller passes operation name and any
+// helpful state. Result includes retcode + comment + last_error for
+// post-mortem.
+void LogTradeFailure(string op, ulong ticket = 0)
+{
+   uint   rc       = trade.ResultRetcode();
+   string rcStr    = TradeRetcodeString(rc);
+   string rcComm   = trade.ResultComment();
+   int    lastErr  = GetLastError();
+   PrintFormat("[PL.2] trade.%s FAIL ticket=%I64u retcode=%u(%s) comment=%s last_err=%d",
+               op, ticket, rc, rcStr, rcComm, lastErr);
+   if(IsRetcodeTerminal(rc))
+      PrintFormat("[PL.2] TERMINAL retcode %s — broker rejects this action. Operator should investigate.", rcStr);
+}
+
+//+------------------------------------------------------------------+
 //| Price / volume normalization helpers                              |
 //+------------------------------------------------------------------+
 double NormalizePrice(double p) { return NormalizeDouble(p, _Digits); }
@@ -63,7 +171,10 @@ ulong OpenPosition(int dir, double lots, double sl, double tp, string comment)
    if(tp > 0) tp = NormalizePrice(tp);
 
    if(!trade.PositionOpen(_Symbol, order_type, lots, price, sl, tp, comment))
+   {
+      LogTradeFailure("PositionOpen");
       return 0;
+   }
 
    // Resolve the new position's ticket. For hedging-mode instant-execution
    // brokers, ResultOrder() equals the position ticket. If not, fall back
@@ -136,7 +247,15 @@ bool ModifyPositionSLTP(ulong ticket, double newSL, double newTP)
    if((newTP == 0 && curTP != 0) || (newTP > 0 && MathAbs(curTP - newTP) > (2 * _Point))) need = true;
    if(!need) return true;
 
-   return trade.PositionModify(ticket, newSL, newTP);
+   if(!trade.PositionModify(ticket, newSL, newTP))
+   {
+      uint rc = trade.ResultRetcode();
+      // NO_CHANGES is benign — caller asked to set the value we already had.
+      if(rc != TRADE_RETCODE_NO_CHANGES)
+         LogTradeFailure("PositionModify", ticket);
+      return false;
+   }
+   return true;
 }
 
 //+------------------------------------------------------------------+
@@ -144,7 +263,15 @@ bool ModifyPositionSLTP(ulong ticket, double newSL, double newTP)
 //+------------------------------------------------------------------+
 bool ClosePosition(ulong ticket)
 {
-   return trade.PositionClose(ticket);
+   if(!trade.PositionClose(ticket))
+   {
+      uint rc = trade.ResultRetcode();
+      // POSITION_CLOSED and MARKET_CLOSED are expected during certain windows — log at DEBUG level
+      // (but still log so we have audit trail).
+      LogTradeFailure("PositionClose", ticket);
+      return false;
+   }
+   return true;
 }
 
 //+------------------------------------------------------------------+
