@@ -121,6 +121,9 @@ int OnInit()
    // Skipped in tester. Restored values OVERRIDE the fresh inits above where they overlap.
    LoadRailState();
 
+   // PL.4 — open today's telemetry CSV + log init event.
+   TelemetryInit();
+
    // PL.1 — 60s heartbeat to persist rail state (mirrors what live needs).
    if(!MQLInfoInteger(MQL_TESTER))
       EventSetTimer(60);
@@ -144,6 +147,9 @@ void OnDeinit(const int reason)
 {
    // PL.1 — persist rail state BEFORE other deinits so a crash here doesn't lose state.
    SaveRailState();
+
+   // PL.4 — log deinit event + close CSV.
+   TelemetryDeinit(reason);
 
    // Stop the heartbeat timer if we set one.
    if(!MQLInfoInteger(MQL_TESTER))

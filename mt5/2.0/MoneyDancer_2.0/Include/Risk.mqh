@@ -321,11 +321,18 @@ void EnforceBasketSL_Dir(int dir)
    PrintFormat("[S1.0] basket SL fired: dir=%+d series=%s closed=%d count_today=%d",
                dir, skey, closed, g_basketSLToday);
 
+   // PL.4 — telemetry: log basket-SL fire event
+   TelemetryLogEvent("basket_sl_fired",
+                     StringFormat("dir=%+d series=%s closed=%d", dir, skey, closed),
+                     skey);
+
    if(MaxBasketSLPerDay > 0 && g_basketSLToday >= MaxBasketSLPerDay)
    {
       // Close runners and pyramid too — the day is over for new entries.
       CloseAllPositions();
       PauseAutoUntilNextDay("BASKET_SL_DAY_LIMIT");
+      TelemetryLogEvent("pause_set",
+                        StringFormat("reason=BASKET_SL_DAY_LIMIT count=%d", g_basketSLToday));
    }
 }
 
@@ -376,6 +383,9 @@ void EnforceFridayFlatten()
    PrintFormat("[S1.7] Friday flatten: closed %d positions at %02d:%02d (cutoff=%d)",
                closed, mdt.hour, mdt.min, FridayFlattenHour);
    PauseAutoUntilMonday("FRIDAY_FLATTEN");
+
+   // PL.4 — telemetry: log Friday flatten event
+   TelemetryLogEvent("friday_flatten", StringFormat("closed=%d hour=%d", closed, mdt.hour));
 }
 
 //+------------------------------------------------------------------+
@@ -457,6 +467,11 @@ void EnforceDailyPreClose()
    datetime resume = (today_resume > now) ? today_resume : today_resume + 86400;
    g_tradePauseUntil  = resume;
    g_tradePauseReason = "DAILY_PRECLOSE";
+
+   // PL.4 — telemetry: log daily-pre-close event
+   TelemetryLogEvent("daily_preclose",
+                     StringFormat("closed=%d threshold=%.2f resume=%s",
+                                  closed, DailyPreCloseLossThresholdPct, TimeToString(resume)));
 }
 
 //+------------------------------------------------------------------+
@@ -490,6 +505,10 @@ void EnforceDailyLossKill()
       PauseAutoUntilNextDay("DAILY_LOSS_KILL");
       PrintFormat("[S1.3] daily loss kill: baseline=%.2f eq=%.2f loss=%.2f%% limit=%.2f%%",
                   g_dayBaseBalance, eq, dayLossPct, MaxDailyLossPct);
+
+      // PL.4 — telemetry: log daily-loss kill
+      TelemetryLogEvent("daily_loss_kill",
+                        StringFormat("loss_pct=%.2f limit=%.2f", dayLossPct, MaxDailyLossPct));
    }
 }
 
@@ -511,6 +530,11 @@ void EnforceAllTimeDD()
       PauseAutoUntilNextDay("ALL_TIME_DD_LIMIT");
       PrintFormat("[S1.6] all-time DD kill: peak=%.2f eq=%.2f dd=%.2f%% limit=%.2f%%",
                   g_peakEquityEver, eq, ddPct, MaxAllTimeDDPct);
+
+      // PL.4 — telemetry: log all-time DD trigger
+      TelemetryLogEvent("all_time_dd_kill",
+                        StringFormat("peak=%.2f eq=%.2f dd_pct=%.2f limit=%.2f",
+                                     g_peakEquityEver, eq, ddPct, MaxAllTimeDDPct));
    }
 }
 
