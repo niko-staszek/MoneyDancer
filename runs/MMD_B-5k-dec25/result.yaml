@@ -1,0 +1,45 @@
+run_id: MMD_B-5k-dec25
+story_id: F0
+set_file: 
+symbol: XAUUSD
+account_size: 5000
+data_window: ['', '']
+metrics:
+  net_profit: 10088.8
+  profit_factor: 1.52
+  expected_payoff: 2.52
+  recovery_factor: 3.05
+  sharpe: 21.43
+  balance_dd_max: 3105
+  balance_dd_rel: 17.07
+  equity_dd_max: 3310.47
+  equity_dd_rel: 18.07
+  trades: 3996
+  profit_trades: 2771
+  loss_trades: 1225
+  largest_profit_trade: null
+  largest_loss_trade: null
+  max_consec_losses: 8
+  initial_deposit: null
+raw_metrics:
+  balance_dd_max: 3105
+  balance_dd_rel: 17.07
+  equity_dd_max: 3310.47
+  equity_dd_rel: 18.07
+  expected_payoff: 2.52
+  gross_loss: -19354.1
+  gross_profit: 29443
+  loss_trades: 1225
+  loss_trades_pct: 30.66
+  max_consec_losses: 8
+  max_consec_value_losses: -1362.75
+  max_consec_value_wins: 74.51
+  max_consec_wins: 19
+  net_profit: 10088.8
+  profit_factor: 1.52
+  profit_trades: 2771
+  profit_trades_pct: 69.34
+  recovery_factor: 3.05
+  sharpe: 21.43
+  total_deals: 7992
+  total_trades: 3996

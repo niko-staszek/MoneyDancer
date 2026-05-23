@@ -20,18 +20,20 @@ Canonical, append-only ledger of changes, decisions and findings. **Update this 
 
 ### What's open (next code/test work)
 
+**Status as of 2026-05-23: backtest iteration PAUSED after 4-in-a-row failures since STEP. Only S5.5e (cent forward) is actionable, and it's blocked on user.**
+
 | ID | Description | Status | Task # |
 |---|---|---|---|
-| S2.C.8 | Daily pre-close flatten — INVESTIGATED, NOT SHIPPED | completed (busted on H2 OOS) | #46 |
-| S2.C.9 | Per-DOW × per-regime hour P&L map | planned | #47 |
-| S2.C.4 | Martingale shape (startBe=3, MaxOrdersDir=30) — INVESTIGATED, BUSTED | completed | #48 |
-| S3.2c | PYRAMID_ONLY during MMD-trend | designed, never tested | #49 |
-| S3.2d | PURE_TREND_FOLLOW (stretch) | parked | #50 |
-| S5.5b | Max-lot ceiling discovery per broker | research | #20 |
-| S5.5c | Regime-aware base lot scaling — INVESTIGATED, BUSTED | completed | #51 |
-| S2.C.6 | MMD cloud period tuning (Red 8/12/24) — last cheap static knob | **in-progress** | #52 |
+| S2.C.8 | Daily pre-close flatten — INVESTIGATED, BUSTED on H2 OOS | completed | #46 |
+| S2.C.4 | Martingale shape — INVESTIGATED, BUSTED (startBe=1 structurally required) | completed | #48 |
+| S5.5c | Regime-aware base lot — INVESTIGATED, BUSTED (cell-specific) | completed | #51 |
+| S2.C.6 | MMD cloud Red period — INVESTIGATED, BUSTED | completed | #52 |
+| S2.C.9 | Per-DOW × per-regime hour map | **paused** (low expected payoff vs cost) | #47 |
+| S3.2c | PYRAMID_ONLY during MMD-trend | **paused** (high cost, low confidence) | #49 |
+| S3.2d | PURE_TREND_FOLLOW (stretch) | **paused** | #50 |
+| S5.5b | Max-lot ceiling discovery per broker | research (needs live capacity data) | #20 |
 | S5.5d | Equity-tier scaling | deferred until cent forward | n/a |
-| S5.5e | **Cent-account forward test** | **blocked on user** | #19 |
+| **S5.5e** | **Cent-account forward test** | **BLOCKED on user — only actionable work remaining** | #19 |
 
 ---
 
@@ -299,13 +301,50 @@ S2.C.8 (daily pre-close), S2.C.4 (martingale shape), S5.5c (regime-aware lot) �
 2. Marginal universal improvement (possible but small)
 3. New ship config (low probability without live data signal)
 
-### 2026-05-23 — S2.C.6 MMD cloud period tuning (last cheap static knob, in-progress)
+### 2026-05-23 — S2.C.6 MMD cloud period tuning — BUSTED (4 in a row)
 
-- **Plan note**: S2.C.6 was originally deferred ("only if C.1-C.5 fail"). Conditions met.
-- **Hypothesis**: faster Red cloud (8 vs 12) makes regime classifier more responsive; slower (24) less noisy. Either might improve cell discrimination.
-- **Test**: 2 variants × 5 cells = 10 runs.
-- **Acceptance**: 3/5 improvements, no -30pp, max DD ≤ 37.8%.
-- **If this also fails**: declare backtest iteration EXHAUSTED. Recommend pause until cent forward (S5.5e) provides live signal.
+- **What tried**: 2 variants × 5 cells. A: Red=8 (faster), B: Red=24 (slower).
+- **Result**: both FAIL the gate.
+  - Variant A (Red=8): 0/5 improvements, aggregate -281pp. dec25 -126pp, apr26 -145pp.
+  - Variant B (Red=24): 1/5 improvements, aggregate -124pp. dec25 -104pp.
+- **Lesson**: changing MMD period doesn't improve discriminative power of the regime classifier in any direction. dec25's basket dynamics are robust to MMD timing changes — its 305% comes from the cloud structure WT trusts, not the Red cloud specifically.
+- **Decision memo**: not required — HISTORY entry sufficient.
+
+### 2026-05-23 — DECISION: backtest iteration EXHAUSTED. PAUSE for cent forward.
+
+**4 consecutive failures since STEP shipped (2026-05-21):**
+
+| Story | Mechanism tested | Outcome | Aggregate |
+|---|---|---|---|
+| S2.C.8 | Daily pre-close flatten (conditional ≥6%) | H1 win → H2 OOS reverse | -$6,062 net |
+| S2.C.4 | Martingale shape (startBe=3, MaxOrd=30) | Structurally broken | -602pp / 5 cells |
+| S5.5c | Regime-aware base lot (4 combos) | Cell-specific, no universal direction | -66 to -270pp / 5 cells |
+| S2.C.6 | MMD cloud Red period (faster/slower) | Both directions hurt monsters | -124 to -281pp / 5 cells |
+
+**Recurring failure mode**: every variant that helps one cell hurts another. dec25 + apr26 (monster trend cells) and mar25 + jul25 (weak range cells) want opposite parameter directions. Static cross-cell thresholds cannot satisfy both.
+
+This re-confirms (now for the 5th time) the round-4 finding: **variance is path-dependent**. The cells share NO aggregate-feature discriminator (not ATR, burst freq, tick density, follow-through %, MMD period, lot scaling, basket-loss threshold, hour profile).
+
+### Remaining queued backtest stories — PAUSED
+
+| ID | Story | Why paused |
+|---|---|---|
+| S2.C.9 | Per-DOW × per-regime hour map | Requires ~3-5 hr telemetry code; path-dependence finding predicts cell-specific results — likely also fails the gate |
+| S3.2c | PYRAMID_ONLY during MMD-trend | ~8-11 hr code + Pyramid retune; structural change with no signal it'd beat rails-on STEP |
+| S3.2d | PURE_TREND_FOLLOW | Stretch; lower confidence than 3.2c |
+| S5.5b | Max-lot ceiling discovery per broker | Research item, not optimization; need live capacity data |
+| S5.5d | Equity-tier scaling | Deferred until cent forward proves base scaling |
+
+**ALL have higher cost AND lower expected payoff than what just failed.** Continuing them is unlikely to find a new ship and burns time the user could use to start cent forward.
+
+### Recommendation to user
+
+**STEP is the final shipped backtest config.** Open the RoboForex Pro-Cent demo, deposit $1k real (= cent $100k display), deploy `XAUUSD_2.0_STEP_ship.set`, monitor 30-60 days. The cent forward is the **only remaining signal source** that can:
+1. Confirm STEP's 9.66%/day backtest translates to live (target 40-50% realization = 4-5%/day live)
+2. Reveal whether per-cell variance shows up live in a way that suggests a specific code change
+3. Test the rails (S1.0 basket-SL, S1.6 all-time DD, S5.5f market-closed handler) under real broker conditions
+
+Once cent data lands, the remaining stories may be re-prioritized based on what live data shows. Until then, backtest iteration is on pause.
 
 ---
 
@@ -331,6 +370,7 @@ Things tested enough to bet on:
 | **STEP `StepPoints=80` is the dominant single knob.** Drives both the +51% aggregate win AND the feb25 -43pp regression. No clean separation. | Round 5 isolation tests |
 | **`startBe=1` (aggressive martingale from trade 2) is structurally required under WT+STEP.** Without geometric scaling, small initial losses accumulate uncorrected. Martingale's role under the rails is *recovery*, not *aggression* — the rails handle aggression-prevention. | S2.C.4 (2026-05-23) |
 | **`MaxOrdersDir=50` is operationally unbounded under STEP.** Baskets never reach 30 depth naturally. The cap is a sanity guard, not an active constraint. | S2.C.4 (2026-05-23) |
+| **Backtest iteration is EXHAUSTED at STEP.** Static-knob iteration ran 4 consecutive failures (S2.C.8, S2.C.4, S5.5c, S2.C.6) since STEP shipped. Path-dependence is the dominant variance driver; monsters and weak cells require opposite parameter directions, which no static cross-cell threshold can satisfy. Cent forward is the only remaining signal source. | 2026-05-23 |
 
 ---
 
@@ -355,6 +395,7 @@ Things tested enough to bet on:
 | "Capping basket depth (MaxOrdersDir=30 vs 50)" | Bit-identical results. Baskets never reach 30 naturally under STEP — default 50 is just a sanity guard. | S2.C.4 (2026-05-22/23) |
 | "Pushing base lot in trend regime (LotMultTrend=1.5)" | Aggregate -169pp on 5 cells. Hypothesis INVERTED: monster cells like dec25 lose 100pp when trend lots grow. | S5.5c C2 (2026-05-23) |
 | "Regime-aware base lot scaling is universally improving" | All 4 combos of LotMultRange × LotMultTrend fail. C4 inverse (more in range, less in trend) helps apr26 +109pp but cripples dec25 -193pp. Cell-specific, can't carve by static thresholds. | S5.5c (2026-05-23) |
+| "Tuning MMD Red cloud period (8 or 24 vs 12)" | Both faster and slower hurt monsters. Variant A: -281pp aggregate, dec25 -126pp / apr26 -145pp. Variant B: -124pp, dec25 -104pp. The MMD cloud stack is robust to small Red period changes — cell-specific behavior unaffected. | S2.C.6 (2026-05-23) |
 
 ---
 
