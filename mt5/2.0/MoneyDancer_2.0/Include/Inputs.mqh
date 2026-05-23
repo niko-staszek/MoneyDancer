@@ -230,6 +230,15 @@ input int    DailyResumeHour       = 1;   // S2.C.8 Hour server time to resume n
 // >0.0 = only close baskets whose floating loss >= X% of equity. Lets winning baskets run.
 input double DailyPreCloseLossThresholdPct = 0.0; // S2.C.8 Close only if basket floating loss >= % equity (0=close all)
 
+// PL.5 — Daily EOD summary webhook (Discord/Telegram). Default OFF.
+// REQUIRES: add webhook URL to Tools > Options > Expert Advisors > "Allow WebRequest for listed URL".
+// Format auto-detected: URL containing "telegram" uses Telegram bot API ({"text":...});
+// everything else assumes Discord webhook ({"content":...}).
+input bool   WebhookEnabled        = false; // PL.5 Enable daily EOD push to webhook URL
+input string WebhookUrl            = "";    // PL.5 Webhook URL (Discord or Telegram bot sendMessage URL)
+input int    WebhookEodHour        = 22;    // PL.5 Server hour 0..23 to push EOD summary
+input int    WebhookEodMinute      = 30;    // PL.5 Server minute 0..59 of EOD push
+
 // S1.1 — News-calendar blackout (default OFF; calendar inlined in NewsCalendar.mqh).
 input bool   UseNewsBlackout       = false;  // S1.1 Block new entries around calendar events
 input int    NewsBlackoutPreMin    = 30;     // Minutes BEFORE the event to start blocking

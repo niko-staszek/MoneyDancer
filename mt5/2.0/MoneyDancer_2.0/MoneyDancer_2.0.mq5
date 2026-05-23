@@ -46,6 +46,7 @@
 #include "Include/Persistence.mqh"
 #include "Include/RailStatePersist.mqh"
 #include "Include/SymbolSpec.mqh"
+#include "Include/Webhook.mqh"
 #include "Include/Orders.mqh"
 #include "Include/Slope.mqh"
 #include "Include/MMD.mqh"
@@ -132,7 +133,8 @@ int OnInit()
 //+------------------------------------------------------------------+
 void OnTimer()
 {
-   SaveRailState();
+   SaveRailState();         // PL.1 — heartbeat persistence
+   WebhookCheckAndFire();   // PL.5 — daily EOD push (once per day at WebhookEodHour:Min)
 }
 
 //+------------------------------------------------------------------+
