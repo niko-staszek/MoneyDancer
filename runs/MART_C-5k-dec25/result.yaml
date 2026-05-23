@@ -1,0 +1,45 @@
+run_id: MART_C-5k-dec25
+story_id: F0
+set_file: 
+symbol: XAUUSD
+account_size: 5000
+data_window: ['', '']
+metrics:
+  net_profit: 437.94
+  profit_factor: 1.06
+  expected_payoff: 0.1
+  recovery_factor: 0.19
+  sharpe: 2.11
+  balance_dd_max: 1955.88
+  balance_dd_rel: 28.78
+  equity_dd_max: 2246.54
+  equity_dd_rel: 33.23
+  trades: 4181
+  profit_trades: 3396
+  loss_trades: 785
+  largest_profit_trade: null
+  largest_loss_trade: null
+  max_consec_losses: 10
+  initial_deposit: null
+raw_metrics:
+  balance_dd_max: 1955.88
+  balance_dd_rel: 28.78
+  equity_dd_max: 2246.54
+  equity_dd_rel: 33.23
+  expected_payoff: 0.1
+  gross_loss: -7731.66
+  gross_profit: 8169.6
+  loss_trades: 785
+  loss_trades_pct: 18.78
+  max_consec_losses: 10
+  max_consec_value_losses: -455.51
+  max_consec_value_wins: 42.19
+  max_consec_wins: 62
+  net_profit: 437.94
+  profit_factor: 1.06
+  profit_trades: 3396
+  profit_trades_pct: 81.22
+  recovery_factor: 0.19
+  sharpe: 2.11
+  total_deals: 8362
+  total_trades: 4181

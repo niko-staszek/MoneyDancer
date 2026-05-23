@@ -24,11 +24,11 @@ Canonical, append-only ledger of changes, decisions and findings. **Update this 
 |---|---|---|---|
 | S2.C.8 | Daily pre-close flatten — INVESTIGATED, NOT SHIPPED | completed (busted on H2 OOS) | #46 |
 | S2.C.9 | Per-DOW × per-regime hour P&L map | planned | #47 |
-| S2.C.4 | Martingale shape sample (startBe=3, MaxOrdersDir=30) | **in-progress** | #48 |
+| S2.C.4 | Martingale shape (startBe=3, MaxOrdersDir=30) — INVESTIGATED, BUSTED | completed | #48 |
 | S3.2c | PYRAMID_ONLY during MMD-trend | designed, never tested | #49 |
 | S3.2d | PURE_TREND_FOLLOW (stretch) | parked | #50 |
 | S5.5b | Max-lot ceiling discovery per broker | research | #20 |
-| S5.5c | Regime-aware base lot scaling (LotMultRange/Trend) | designed, never run | #51 |
+| S5.5c | Regime-aware base lot scaling (LotMultRange/Trend) | **in-progress** | #51 |
 | S5.5d | Equity-tier scaling | deferred until cent forward | n/a |
 | S5.5e | **Cent-account forward test** | **blocked on user** | #19 |
 
@@ -260,6 +260,34 @@ Trade counts: dec25 4216 → 4207 (almost unchanged), apr26 5096 → 4292 (-800 
 
 **Decision memo**: `runs/decisions/2026-05-22-s2c8-daily-preclose.md` to write up the failure.
 
+### 2026-05-23 — S2.C.4 Martingale shape (busted, 5-cell sample only)
+
+- **What tried**: 3 variants on 5 cells (mar25, jul25, dec25, apr26, jan26):
+  - A: `startBe=3` (delayed martingale: 4 trades before geometric adds)
+  - B: `MaxOrdersDir=30` (depth cap, was 50)
+  - C: combined A + B
+- **Result**: 
+  - Variant A catastrophic: -602pp aggregate on 5 cells. dec25 +306% → +9%, jul25 +59% → -38%.
+  - Variant B bit-identical to STEP (baskets never reach 30 naturally).
+  - Variant C identical to A (startBe dominates).
+- **Lesson**: under WT+STEP, `startBe=1` (aggressive martingale from trade 2) is structurally required. The rails (basket-SL, regime gate) provide the aggression-prevention; martingale's job is recovery. Delaying martingale breaks the recovery, causing accumulated small losses.
+- **Decision**: drop S2.C.4. STEP stays. Added 2 entries to validated facts + busted hypotheses.
+- **Decision memo**: not required — this was a 5-cell sample with clear catastrophic results. HISTORY.md entry is sufficient.
+- **Next**: S5.5c (regime-aware base lot scaling — LotMultRange/Trend inputs already in code).
+
+### 2026-05-23 — S5.5c Regime-aware base lot (in-progress)
+
+- **Hypothesis**: PF varies 1.0-1.6 across regimes (low-vol weak vs high-vol strong). Scaling base lot down in low-vol/range regimes preserves capital for high-vol/trend periods where the edge is stronger.
+- **Code already in place** (default OFF): `LotMultRange`, `LotMultTrend` inputs in Inputs.mqh; `ComputeBaseLot()` multiplies by the regime-matched factor.
+- **Plan**: sweep LotMultRange × LotMultTrend on 5 cells with combinations {0.5, 1.0, 1.5, 2.0} × {0.5, 1.0, 1.5, 2.0}. 16 combos × 5 cells = 80 runs — too many. Trim to 4 high-leverage combos.
+- **Test set** (cells): mar25 (weak), jul25 (weak), dec25 (monster), apr26 (monster), jan26 (marginal)
+- **Combos to test**:
+  - C1: LotMultRange=0.5, LotMultTrend=1.0 (less risk in range, normal in trend)
+  - C2: LotMultRange=1.0, LotMultTrend=1.5 (normal in range, push in trend)
+  - C3: LotMultRange=0.5, LotMultTrend=1.5 (less in range, push in trend)
+  - C4: LotMultRange=1.5, LotMultTrend=0.5 (push in range, less in trend — control/inverse)
+- **Acceptance**: any combo with 3/5 improvements, no -30pp regression, max DD ≤ 37.8%.
+
 ---
 
 ## 4. Validated facts (knowledge we keep)
@@ -282,6 +310,8 @@ Things tested enough to bet on:
 | **Weekend gap is a real loss pattern.** 4 of 5 worst OOS-2025 DDs start Friday and trough Tue/Wed. S1.7 Friday flatten mitigates. | `feedback_friday_weekend_gap.md` |
 | **XAU daily-break is a real loss pattern.** ~30 min market-closed pocket around 00:00 UTC where basket-SL rail can't fire. Drove may25-H2 40.48% breach. | S5.5f scan; `runs/decisions/2.0-release-and-validation.md` § H2 |
 | **STEP `StepPoints=80` is the dominant single knob.** Drives both the +51% aggregate win AND the feb25 -43pp regression. No clean separation. | Round 5 isolation tests |
+| **`startBe=1` (aggressive martingale from trade 2) is structurally required under WT+STEP.** Without geometric scaling, small initial losses accumulate uncorrected. Martingale's role under the rails is *recovery*, not *aggression* — the rails handle aggression-prevention. | S2.C.4 (2026-05-23) |
+| **`MaxOrdersDir=50` is operationally unbounded under STEP.** Baskets never reach 30 depth naturally. The cap is a sanity guard, not an active constraint. | S2.C.4 (2026-05-23) |
 
 ---
 
@@ -302,6 +332,8 @@ Things tested enough to bet on:
 | "MMD adverse-side gates (Block D / E)" | Conditions almost never fire under WT (basket already direction-filtered) | Round 4 Opt2/3 |
 | "Bidirectional regime-aware basket SL (8/12/4)" | TrendWith too loose, TrendAgainst clips monster captures | Round 4 Opt1 |
 | "Daily pre-close flatten before XAU break (S2.C.8)" | H1 won (+$3.9k) but H2 OOS lost $10k. Static loss threshold doesn't generalize — mar26-H2 alone -$2,715 from forfeited monster builds. The cure costs more than the disease. | S2.C.8 R1-R6 (2026-05-21/22) |
+| "Delayed martingale (startBe=3) is safer" | Catastrophic on 5-cell sample: -602pp aggregate (dec25 +306 → +9, jul25 +59 → -38). Under WT+STEP, aggressive `startBe=1` martingale is STRUCTURALLY REQUIRED — small initial losses can't be recovered without geometric scaling. Regime gate + STEP knobs already filter bad entries, so martingale's role is recovery, not aggression. | S2.C.4 (2026-05-22/23) |
+| "Capping basket depth (MaxOrdersDir=30 vs 50)" | Bit-identical results. Baskets never reach 30 naturally under STEP — default 50 is just a sanity guard. | S2.C.4 (2026-05-22/23) |
 
 ---
 
