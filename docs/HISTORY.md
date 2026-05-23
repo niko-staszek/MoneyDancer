@@ -13,7 +13,8 @@ Canonical, append-only ledger of changes, decisions and findings. **Update this 
 | **Ship config** | `mt5/2.0/MoneyDancer_2.0/presets/XAUUSD_2.0_STEP_ship.set` |
 | **Ship lineage** | S17 (block-both) → WT (with-trend) → **STEP** (WT + StepPoints=80 + MinOrderDistancePts=60) |
 | **Last ship commit** | `7521035` — "ship MoneyDancer 2.0 (STEP variant) + 1.2 reconstruction + DiscoSignalReplay" |
-| **Last code change** | `17150ff` — "add S2.C.8 daily pre-close flatten (path 2)" (in-test) |
+| **Last code change** | `ae9a874` — "PL.5 daily EOD webhook" (pre-live engineering complete) |
+| **Pre-live engineering** | PL.1 (rail state persistence), PL.2 (order error logging), PL.3 (symbol-spec assertion), PL.5 (daily EOD webhook). PL.4 (full CSV telemetry) deferred — Print() to Experts log sufficient for MVP. |
 | **32-cell validation** | H1 16 cells + H2 OOS 16 cells. 28/32 positive (87.5%). Total $144,314 on $5k baseline (× 32 cells). Mean +90.2% / cell. Max DD 40.48% (may25-H2). |
 | **Daily-avg backtest** | +9.66% / day H1; +8.21% / day H2. Live decay expected 40-50% → realistic 4-5% / day target. |
 | **Blocking next step** | S5.5e cent-account forward test — user opens RoboForex Pro-Cent demo with $1k real, deploys STEP .set, monitors 30-60 days. |
@@ -34,6 +35,11 @@ Canonical, append-only ledger of changes, decisions and findings. **Update this 
 | S5.5b | Max-lot ceiling discovery per broker | research (needs live capacity data) | #20 |
 | S5.5d | Equity-tier scaling | deferred until cent forward | n/a |
 | **S5.5e** | **Cent-account forward test** | **BLOCKED on user — only actionable work remaining** | #19 |
+| PL.1 | Rail state persistence across EA restart | ✅ shipped `2c82ea3` | #53 |
+| PL.2 | Order-send error logging | ✅ shipped `5136346` | #54 |
+| PL.3 | Symbol-spec assertion (OnInit) | ✅ shipped `5136346` | #55 |
+| PL.4 | Full CSV telemetry (CashCabaret 48-col) | deferred — Experts log sufficient | #56 |
+| PL.5 | Daily EOD webhook (Discord/Telegram) | ✅ shipped `ae9a874` | #57 |
 
 ---
 
@@ -346,6 +352,41 @@ This re-confirms (now for the 5th time) the round-4 finding: **variance is path-
 
 Once cent data lands, the remaining stories may be re-prioritized based on what live data shows. Until then, backtest iteration is on pause.
 
+### 2026-05-23 — Pre-live engineering (PL.1, PL.2, PL.3, PL.5 shipped)
+
+After declaring backtest iteration exhausted, surfaced and addressed pre-live code gaps that would have put $1k real money at risk. **PL.4 (full CSV telemetry) deferred** — existing `Print()` to MT5 Experts log with module prefixes (`[S1.0]`, `[S2.C.8]`, `[PL.1]` etc.) is sufficient for MVP forensic analysis.
+
+**PL.1 Rail state persistence** (`Include/RailStatePersist.mqh`, commit `2c82ea3`):
+- Persists Tier-A state (peakEquityEver, basketSLToday/DayKey, tradePauseUntil/Reason, series active/id/openEq/SLFired, baseDayKey/Balance/Ready/Time, lastBuy/SellTime, lastDealsCount, profitLock state) to CSV file `MoneyDancer_railstate_<Magic>_<Symbol>.csv` in MQL5/Files.
+- LoadRailState() called at end of OnInit; SaveRailState() at top of OnDeinit; 60s heartbeat via OnTimer.
+- Skipped in tester (MQL_TESTER guard) → backtest stays bit-identical.
+- **Solves**: cent demo weekend restart loses accumulated DD/day-counter/series anchors.
+
+**PL.2 Order error logging** (`Include/Orders.mqh` extensions, commit `5136346`):
+- `TradeRetcodeString()` decodes 40+ MT5 retcodes to readable strings.
+- `IsRetcodeRetryable()` / `IsRetcodeTerminal()` classify failures.
+- `LogTradeFailure(op, ticket)` uniform `[PL.2]` log on any trade.* failure.
+- Wired in `OpenPosition`, `ModifyPositionSLTP`, `ClosePosition` — surfaces broker-rejection codes that were previously silent.
+- **Solves**: silent broker rejections that masked the actual failure mode.
+
+**PL.3 Symbol-spec assertion** (`Include/SymbolSpec.mqh`, commit `5136346`):
+- `VerifySymbolSpec()` called at OnInit (skipped in tester).
+- ALWAYS logs all spec fields for forensic comparison (cent vs standard).
+- HARD ASSERTS on: digits outside {2,3}, contract_size outside [10,1000], vol_min/step outside (0,1], tick_value <= 0, SYMBOL_TRADE_MODE=DISABLED.
+- SOFT WARNS on: large stops_level, large swap.
+- Returns false → INIT_FAILED if specs unexpected; EA refuses to trade.
+- **Solves**: cent-account-vs-standard spec ambiguity that could cause wildly wrong lot sizing on real money.
+
+**PL.5 Daily EOD webhook** (`Include/Webhook.mqh`, commit `ae9a874`):
+- New inputs: `WebhookEnabled` (default false), `WebhookUrl`, `WebhookEodHour` (22), `WebhookEodMinute` (30).
+- Auto-detects Discord vs Telegram from URL pattern.
+- Posts daily summary: balance/equity/free, day P&L %, floating + open positions, peak equity + DD %, basket-SL count, pause state, series active/off.
+- Once-per-day via `g_webhook_lastPushDayKey` tracker. Called from OnTimer 60s.
+- Requires MT5 setup: Tools > Options > Expert Advisors > "Allow WebRequest for listed URL" → add webhook host.
+- **Solves**: user can't watch MT5 24/7; needs at-a-glance daily status without polling.
+
+**Backtest invariance**: all four pre-live features gated by `!MQLInfoInteger(MQL_TESTER)`. STEP backtest results unchanged. Verified via code review (no SUCCESS-path changes in trade.* wrappers).
+
 ---
 
 ## 4. Validated facts (knowledge we keep)
@@ -371,6 +412,9 @@ Things tested enough to bet on:
 | **`startBe=1` (aggressive martingale from trade 2) is structurally required under WT+STEP.** Without geometric scaling, small initial losses accumulate uncorrected. Martingale's role under the rails is *recovery*, not *aggression* — the rails handle aggression-prevention. | S2.C.4 (2026-05-23) |
 | **`MaxOrdersDir=50` is operationally unbounded under STEP.** Baskets never reach 30 depth naturally. The cap is a sanity guard, not an active constraint. | S2.C.4 (2026-05-23) |
 | **Backtest iteration is EXHAUSTED at STEP.** Static-knob iteration ran 4 consecutive failures (S2.C.8, S2.C.4, S5.5c, S2.C.6) since STEP shipped. Path-dependence is the dominant variance driver; monsters and weak cells require opposite parameter directions, which no static cross-cell threshold can satisfy. Cent forward is the only remaining signal source. | 2026-05-23 |
+| **Rail state MUST persist across EA restart on live.** Currently g_peakEquityEver, g_basketSLToday, g_tradePauseUntil, series anchors all reset on OnInit. Weekend close + Monday restart loses accumulated DD/counters. PL.1 fixes this via on-disk CSV; tester-invariant. | PL.1 (2026-05-23) |
+| **Order-send failures must be logged, not silent.** Default CTrade behavior returns false on failure but doesn't surface retcode. PL.2 adds `LogTradeFailure(op, ticket)` with retcode-to-string decoder so post-mortem analysis on live is possible. | PL.2 (2026-05-23) |
+| **Symbol specs must be verified at OnInit on live.** Cent vs standard account ambiguity could give wildly wrong lot sizing. PL.3 asserts contract_size/vol_min/digits/calc_mode at OnInit; refuses init if specs unexpected. | PL.3 (2026-05-23) |
 
 ---
 
