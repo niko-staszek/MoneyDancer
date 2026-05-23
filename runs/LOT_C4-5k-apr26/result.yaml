@@ -1,0 +1,45 @@
+run_id: LOT_C4-5k-apr26
+story_id: F0
+set_file: 
+symbol: XAUUSD
+account_size: 5000
+data_window: ['', '']
+metrics:
+  net_profit: 18368.7
+  profit_factor: 1.57
+  expected_payoff: 3.18
+  recovery_factor: 6.28
+  sharpe: 42.8
+  balance_dd_max: 3242.71
+  balance_dd_rel: 12.89
+  equity_dd_max: 2926.67
+  equity_dd_rel: 11.85
+  trades: 5773
+  profit_trades: 4160
+  loss_trades: 1613
+  largest_profit_trade: null
+  largest_loss_trade: null
+  max_consec_losses: 8
+  initial_deposit: null
+raw_metrics:
+  balance_dd_max: 3242.71
+  balance_dd_rel: 12.89
+  equity_dd_max: 2926.67
+  equity_dd_rel: 11.85
+  expected_payoff: 3.18
+  gross_loss: -31946.6
+  gross_profit: 50315.3
+  loss_trades: 1613
+  loss_trades_pct: 27.94
+  max_consec_losses: 8
+  max_consec_value_losses: -1593.67
+  max_consec_value_wins: 756.32
+  max_consec_wins: 23
+  net_profit: 18368.7
+  profit_factor: 1.57
+  profit_trades: 4160
+  profit_trades_pct: 72.06
+  recovery_factor: 6.28
+  sharpe: 42.8
+  total_deals: 11546
+  total_trades: 5773

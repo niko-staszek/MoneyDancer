@@ -28,7 +28,8 @@ Canonical, append-only ledger of changes, decisions and findings. **Update this 
 | S3.2c | PYRAMID_ONLY during MMD-trend | designed, never tested | #49 |
 | S3.2d | PURE_TREND_FOLLOW (stretch) | parked | #50 |
 | S5.5b | Max-lot ceiling discovery per broker | research | #20 |
-| S5.5c | Regime-aware base lot scaling (LotMultRange/Trend) | **in-progress** | #51 |
+| S5.5c | Regime-aware base lot scaling — INVESTIGATED, BUSTED | completed | #51 |
+| S2.C.6 | MMD cloud period tuning (Red 8/12/24) — last cheap static knob | **in-progress** | #52 |
 | S5.5d | Equity-tier scaling | deferred until cent forward | n/a |
 | S5.5e | **Cent-account forward test** | **blocked on user** | #19 |
 
@@ -275,18 +276,36 @@ Trade counts: dec25 4216 → 4207 (almost unchanged), apr26 5096 → 4292 (-800 
 - **Decision memo**: not required — this was a 5-cell sample with clear catastrophic results. HISTORY.md entry is sufficient.
 - **Next**: S5.5c (regime-aware base lot scaling — LotMultRange/Trend inputs already in code).
 
-### 2026-05-23 — S5.5c Regime-aware base lot (in-progress)
+### 2026-05-23 — S5.5c Regime-aware base lot — BUSTED
 
-- **Hypothesis**: PF varies 1.0-1.6 across regimes (low-vol weak vs high-vol strong). Scaling base lot down in low-vol/range regimes preserves capital for high-vol/trend periods where the edge is stronger.
-- **Code already in place** (default OFF): `LotMultRange`, `LotMultTrend` inputs in Inputs.mqh; `ComputeBaseLot()` multiplies by the regime-matched factor.
-- **Plan**: sweep LotMultRange × LotMultTrend on 5 cells with combinations {0.5, 1.0, 1.5, 2.0} × {0.5, 1.0, 1.5, 2.0}. 16 combos × 5 cells = 80 runs — too many. Trim to 4 high-leverage combos.
-- **Test set** (cells): mar25 (weak), jul25 (weak), dec25 (monster), apr26 (monster), jan26 (marginal)
-- **Combos to test**:
-  - C1: LotMultRange=0.5, LotMultTrend=1.0 (less risk in range, normal in trend)
-  - C2: LotMultRange=1.0, LotMultTrend=1.5 (normal in range, push in trend)
-  - C3: LotMultRange=0.5, LotMultTrend=1.5 (less in range, push in trend)
-  - C4: LotMultRange=1.5, LotMultTrend=0.5 (push in range, less in trend — control/inverse)
-- **Acceptance**: any combo with 3/5 improvements, no -30pp regression, max DD ≤ 37.8%.
+- **What tried**: 4 combos × 5 cells using `LotMultRange` + `LotMultTrend` inputs (code already in place).
+- **Result**: all 4 combos FAIL the gate (3/5 improve, no -30pp, DD ≤ 37.8%).
+  - C1 (Range=0.5, Trend=1.0): aggregate -270pp, dec25 -127, apr26 -143
+  - C2 (Range=1.0, Trend=1.5 — original hypothesis): aggregate -169pp. **Hypothesis inverted.**
+  - C3 (Range=0.5, Trend=1.5): aggregate -234pp
+  - C4 (Range=1.5, Trend=0.5 — INVERSE): aggregate -66pp. apr26 +109pp ✓ but dec25 -193pp ✗
+- **Surprise**: C4 made apr26 GROW by 109pp but crippled dec25 by 193pp. Cell-specific asymmetry — same pattern as S2.C.8.
+- **mar25 and jan26 unchanged across all 4 combos**: those cells stay in single regime for the whole window, so only one multiplier applies (and equals 1.0 in 3 of 4 combos).
+- **Lesson**: regime-aware base lot scaling doesn't carve a universal win. The PF-by-regime distinction is real but cell-specific in direction — can't be addressed by a static cross-cell multiplier.
+- **Added to busted hypotheses**: "PF higher in trend → push trend lots" (the original hypothesis) is wrong direction empirically.
+- **Decision memo**: not required — HISTORY.md entry sufficient. Pattern is becoming clear.
+
+### Pattern (3 consecutive failures since STEP shipped)
+
+S2.C.8 (daily pre-close), S2.C.4 (martingale shape), S5.5c (regime-aware lot) — all three iterations after STEP have FAILED. The round-4 path-dependence finding is the dominant truth: **STEP is at a strong local optimum for static-knob iteration**. Aggregate market features don't predict cell variance; cell-specific behavior can't be carved by global thresholds.
+
+**Implication**: remaining queued backtest stories (S2.C.9 per-DOW × regime hour, S3.2c PYRAMID_ONLY, S3.2d, S5.5b/d) are all higher-effort lower-confidence than what we just exhausted. Likely outcomes ranked from most to least likely:
+1. Same cell-specific or static-overfit failures (most likely)
+2. Marginal universal improvement (possible but small)
+3. New ship config (low probability without live data signal)
+
+### 2026-05-23 — S2.C.6 MMD cloud period tuning (last cheap static knob, in-progress)
+
+- **Plan note**: S2.C.6 was originally deferred ("only if C.1-C.5 fail"). Conditions met.
+- **Hypothesis**: faster Red cloud (8 vs 12) makes regime classifier more responsive; slower (24) less noisy. Either might improve cell discrimination.
+- **Test**: 2 variants × 5 cells = 10 runs.
+- **Acceptance**: 3/5 improvements, no -30pp, max DD ≤ 37.8%.
+- **If this also fails**: declare backtest iteration EXHAUSTED. Recommend pause until cent forward (S5.5e) provides live signal.
 
 ---
 
@@ -334,6 +353,8 @@ Things tested enough to bet on:
 | "Daily pre-close flatten before XAU break (S2.C.8)" | H1 won (+$3.9k) but H2 OOS lost $10k. Static loss threshold doesn't generalize — mar26-H2 alone -$2,715 from forfeited monster builds. The cure costs more than the disease. | S2.C.8 R1-R6 (2026-05-21/22) |
 | "Delayed martingale (startBe=3) is safer" | Catastrophic on 5-cell sample: -602pp aggregate (dec25 +306 → +9, jul25 +59 → -38). Under WT+STEP, aggressive `startBe=1` martingale is STRUCTURALLY REQUIRED — small initial losses can't be recovered without geometric scaling. Regime gate + STEP knobs already filter bad entries, so martingale's role is recovery, not aggression. | S2.C.4 (2026-05-22/23) |
 | "Capping basket depth (MaxOrdersDir=30 vs 50)" | Bit-identical results. Baskets never reach 30 naturally under STEP — default 50 is just a sanity guard. | S2.C.4 (2026-05-22/23) |
+| "Pushing base lot in trend regime (LotMultTrend=1.5)" | Aggregate -169pp on 5 cells. Hypothesis INVERTED: monster cells like dec25 lose 100pp when trend lots grow. | S5.5c C2 (2026-05-23) |
+| "Regime-aware base lot scaling is universally improving" | All 4 combos of LotMultRange × LotMultTrend fail. C4 inverse (more in range, less in trend) helps apr26 +109pp but cripples dec25 -193pp. Cell-specific, can't carve by static thresholds. | S5.5c (2026-05-23) |
 
 ---
 
