@@ -44,6 +44,7 @@
 #include "Include/Globals.mqh"
 #include "Include/Utils.mqh"
 #include "Include/Persistence.mqh"
+#include "Include/RailStatePersist.mqh"
 #include "Include/Orders.mqh"
 #include "Include/Slope.mqh"
 #include "Include/MMD.mqh"
@@ -102,7 +103,23 @@ int OnInit()
    Dashboard_Init();
    RebuildLast24hMarkers();
 
+   // PL.1 — load saved rail state (S1.6 peak, S1.0 day counter, pauses, series anchors).
+   // Skipped in tester. Restored values OVERRIDE the fresh inits above where they overlap.
+   LoadRailState();
+
+   // PL.1 — 60s heartbeat to persist rail state (mirrors what live needs).
+   if(!MQLInfoInteger(MQL_TESTER))
+      EventSetTimer(60);
+
    return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Periodic heartbeat — persist rail state every 60s (PL.1)         |
+//+------------------------------------------------------------------+
+void OnTimer()
+{
+   SaveRailState();
 }
 
 //+------------------------------------------------------------------+
@@ -110,6 +127,13 @@ int OnInit()
 //+------------------------------------------------------------------+
 void OnDeinit(const int reason)
 {
+   // PL.1 — persist rail state BEFORE other deinits so a crash here doesn't lose state.
+   SaveRailState();
+
+   // Stop the heartbeat timer if we set one.
+   if(!MQLInfoInteger(MQL_TESTER))
+      EventKillTimer();
+
    // Save current positions on EA stop/unload.
    SyncPositionsWithTerminal(true);
    SavePositionsToFile();
