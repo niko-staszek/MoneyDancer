@@ -387,8 +387,7 @@ void DetectAndHandleSignal()
    if(!signal) return;
 
    g_lastSigDir  = dir;
-   g_lastPeak    = peak;
-   g_lastMovePts = movePts;
+   // CR-I2: g_lastPeak/g_lastMovePts assignments dropped — they were write-only.
 
    HandleSignal(dir);
 }

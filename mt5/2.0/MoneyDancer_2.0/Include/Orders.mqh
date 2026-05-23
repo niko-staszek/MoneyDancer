@@ -314,27 +314,8 @@ int CloseAllPositionsType(ENUM_POSITION_TYPE posType)
    return closed;
 }
 
-//+------------------------------------------------------------------+
-//| Close only profitable positions of the given type.               |
-//| Profit = POSITION_PROFIT + POSITION_SWAP (commission is on       |
-//| deals, not live positions — see header comment).                  |
-//+------------------------------------------------------------------+
-int CloseProfitPositions(ENUM_POSITION_TYPE posType)
-{
-   int closed = 0;
-   for(int i = PositionsTotal() - 1; i >= 0; i--)
-   {
-      ulong ticket = PositionGetTicket(i);
-      if(ticket == 0) continue;
-      if(!IsMinePosition()) continue;
-      if((ENUM_POSITION_TYPE)PositionGetInteger(POSITION_TYPE) != posType) continue;
-
-      double profit = PositionGetDouble(POSITION_PROFIT) + PositionGetDouble(POSITION_SWAP);
-      if(profit <= 0) continue;
-
-      if(trade.PositionClose(ticket)) closed++;
-   }
-   return closed;
-}
+// CR-M4: CloseProfitPositions removed — never called from 2.0 codebase.
+// Dashboard has its own CloseProfitOrders. If consolidation is wanted later,
+// refactor Dashboard to reuse this rather than re-adding the duplicate.
 
 #endif // __MD_ORDERS_MQH__

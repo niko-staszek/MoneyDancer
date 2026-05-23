@@ -62,9 +62,14 @@ void UpdateDailyBaselineAndMetrics()
       g_lockedProfitUsd    = 0.0;
       g_profitLockTime     = 0;
 
-      // S1.0 — reset basket-SL counter on day change
-      g_basketSLToday  = 0;
-      g_basketSLDayKey = dk;
+      // S1.0 — reset basket-SL counter on day change.
+      // CR-I1 fix: gate this on g_basketSLDayKey so a daily-baseline-hour
+      // change mid-day doesn't accidentally reset the counter mid-day.
+      if(g_basketSLDayKey != dk)
+      {
+         g_basketSLToday  = 0;
+         g_basketSLDayKey = dk;
+      }
 
       // Reset pause reason only if pause already expired
       if(!IsAutoPaused())
@@ -233,40 +238,16 @@ int CloseSeriesBasketPositions_S10(int dir, string seriesKey)
    return closed;
 }
 
-// S5.5f: market-closed detection so basket-SL rail doesn't bang the gate
-// during the gold daily-break hour (~00:00-01:00 UTC). When market is closed,
-// log ONCE per series-direction-per-window and back off until reopen.
+// S5.5f: market-closed detection. The pre-check was deleted (CR-C4) since
+// SYMBOL_TRADE_MODE_DISABLED is a permanent state not a session window —
+// the pre-check was dead code in practice. The post-attempt error path
+// (line ~290) is the real market-closed handler.
 datetime g_basketSLMarketClosedLogged_Buy  = 0;
 datetime g_basketSLMarketClosedLogged_Sell = 0;
-
-bool IsMarketCurrentlyClosed()
-{
-   long tm = (long)SymbolInfoInteger(_Symbol, SYMBOL_TRADE_MODE);
-   if(tm == SYMBOL_TRADE_MODE_DISABLED) return true;
-   if(tm == SYMBOL_TRADE_MODE_CLOSEONLY) return false;  // close-only IS available for SL
-   // Sessions check: SymbolInfoSessionTrade for current weekday.
-   // For tester simplicity, rely on the close-orders' [Market closed] error to surface.
-   return false;
-}
 
 void EnforceBasketSL_Dir(int dir)
 {
    if(!BasketEquitySLTriggered(dir)) return;
-
-   // S5.5f: short-circuit if we already know market is closed (avoid log spam).
-   if(IsMarketCurrentlyClosed())
-   {
-      datetime lastLog = (dir > 0 ? g_basketSLMarketClosedLogged_Buy : g_basketSLMarketClosedLogged_Sell);
-      datetime now = TimeCurrent();
-      if(lastLog == 0 || (now - lastLog) > 300)  // log at most once per 5 min
-      {
-         PrintFormat("[S1.0] market closed — basket SL deferred until reopen (dir=%+d, eq=%.2f peak=%.2f)",
-                     dir, AccountInfoDouble(ACCOUNT_EQUITY), g_peakEquityEver);
-         if(dir > 0) g_basketSLMarketClosedLogged_Buy = now;
-         else        g_basketSLMarketClosedLogged_Sell = now;
-      }
-      return;
-   }
 
    int    seriesId = CurrentSeriesId(dir);
    string skey     = SeriesKey(dir, seriesId);
@@ -338,7 +319,14 @@ void EnforceBasketSL_Dir(int dir)
 
 void EnforceBasketSL()
 {
-   if(MaxBasketLossPct <= 0.0) return;
+   // CR-C1 fix: also enable rail when only the regime-aware S2.A.7 overrides
+   // are set (without a base MaxBasketLossPct). Previously the rail was
+   // silently disabled for users following the regime-aware setup docs.
+   bool any_override = (MaxBasketLossPctRange        > 0.0
+                     || MaxBasketLossPctTrendWith    > 0.0
+                     || MaxBasketLossPctTrendAgainst > 0.0);
+   if(MaxBasketLossPct <= 0.0 && !any_override) return;
+
    // Intentionally does NOT respect IsAutoPaused(): pause blocks new entries,
    // but existing positions still need rail-level monitoring. The Feb-2025
    // catastrophe happened because the rails went idle during pause while the
@@ -403,7 +391,8 @@ void EnforceDailyPreClose()
    datetime now = TimeCurrent();
    MqlDateTime mdt;
    TimeToStruct(now, mdt);
-   if(mdt.day_of_week == 6) return;          // Saturday — broker closed
+   // CR-I5 fix: MT5 day_of_week: 0=Sunday, 6=Saturday. Both are non-trading.
+   if(mdt.day_of_week == 0 || mdt.day_of_week == 6) return;
 
    bool past_cutoff = (mdt.hour > DailyPreCloseHour) ||
                       (mdt.hour == DailyPreCloseHour && mdt.min >= DailyPreCloseMinute);
@@ -446,6 +435,17 @@ void EnforceDailyPreClose()
                         n, pl, DailyPreCloseLossThresholdPct, lossAbsThreshold, mdt.hour, mdt.min);
          }
       }
+
+      // CR-I9 fix: in conditional-close mode, if we closed any basket
+      // direction, ALSO sweep up runners and pyramid positions in that
+      // direction. Otherwise the broker enters the daily-break window
+      // with hedge runners / pyramid open and the rail's "no exposure
+      // during closed window" purpose is defeated.
+      if(closed > 0)
+      {
+         int extras = CloseAllPositions();  // closes runners + pyramid + any leftovers
+         if(extras > closed) PrintFormat("[S2.C.8] daily pre-close: also closed %d extras (runners/pyramid)", extras - closed);
+      }
    }
    else
    {
@@ -475,18 +475,6 @@ void EnforceDailyPreClose()
 }
 
 //+------------------------------------------------------------------+
-//| S1.6 — all-time peak-to-trough drawdown trailing kill.            |
-//|                                                                   |
-//| Tracks the running max equity since EA start. When the drawdown   |
-//| from that peak reaches MaxAllTimeDDPct, close everything and      |
-//| pause until next 00:00. Peak is also kept fresh here so the rail  |
-//| is self-contained — does not depend on the dashboard updater.     |
-//|                                                                   |
-//| Caveat: peak resets to current equity on EA restart (no on-disk   |
-//| persistence yet). For long live runs, expect a one-time reset of  |
-//| the rail at every (re)start. In backtest this is a non-issue.     |
-//+------------------------------------------------------------------+
-//+------------------------------------------------------------------+
 //| S1.3 - intraday hard daily-loss kill (separate from S1.6 which is |
 //| all-time). Triggers when today's realized+floating loss vs the    |
 //| daily baseline reaches MaxDailyLossPct%. Closes all + pauses day. |
@@ -512,6 +500,16 @@ void EnforceDailyLossKill()
    }
 }
 
+//+------------------------------------------------------------------+
+//| S1.6 — all-time peak-to-trough drawdown trailing kill.            |
+//|                                                                   |
+//| Tracks the running max equity since EA start. When the drawdown   |
+//| from that peak reaches MaxAllTimeDDPct, close everything and      |
+//| pause until next 00:00. Peak is also kept fresh here so the rail  |
+//| is self-contained — does not depend on the dashboard updater.    |
+//|                                                                   |
+//| Peak is now persisted across EA restart by PL.1 (RailStatePersist).|
+//+------------------------------------------------------------------+
 void EnforceAllTimeDD()
 {
    if(MaxAllTimeDDPct <= 0.0) return;

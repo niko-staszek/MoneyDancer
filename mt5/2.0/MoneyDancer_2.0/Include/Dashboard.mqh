@@ -35,11 +35,14 @@ CTrade g_dashTrade;
 //+------------------------------------------------------------------+
 void Dashboard_Init()
 {
-   g_dashTrade.SetExpertMagicNumber(Magic);
-   g_dashTrade.SetDeviationInPoints(Slippage);
+   g_dashTrade.SetExpertMagicNumber((ulong)Magic);
+   g_dashTrade.SetDeviationInPoints((ulong)Slippage);
 
-   g_peakEquityEver  = AccountInfoDouble(ACCOUNT_EQUITY);
-   g_peakEquityToday = AccountInfoDouble(ACCOUNT_EQUITY);
+   // CR-C3 fix: only initialize peaks if not already set (e.g., by PL.1 LoadRailState).
+   // Was an unconditional overwrite — would silently lose persisted S1.6 trailing peak
+   // if OnInit reordering put LoadRailState before Dashboard_Init.
+   if(g_peakEquityEver  <= 0.0) g_peakEquityEver  = AccountInfoDouble(ACCOUNT_EQUITY);
+   if(g_peakEquityToday <= 0.0) g_peakEquityToday = AccountInfoDouble(ACCOUNT_EQUITY);
 
    for(int i = 0; i < 5; i++) g_aiMessages[i] = "Initializing...";
    ArrayInitialize(g_m15Pnl, 0.0);
@@ -1071,31 +1074,41 @@ double SeriesProfitAndLastClose24h(string seriesKey, datetime &lastT, double &la
 
 void FinalizeSeriesIfEnded(int dir)
 {
-   if(!ShowBasketLabels) return;
+   // CR-C2 fix: STATE mutation (SetSeriesActive) must run regardless of
+   // dashboard-visibility settings. Previously the function early-returned
+   // on !ShowBasketLabels, which left the series-active flag stuck true
+   // after the basket closed via broker — causing the next entry to
+   // attach to a dead series id. Now the early-return only gates the
+   // label DRAWING; state mutation always runs.
    if(!SeriesActive(dir)) return;
 
    int cnt = CountOrdersDir(dir, true);
    if(cnt > 0) return;
 
-   int id = CurrentSeriesId(dir);
-   string key = SeriesKey(dir, id);
-
-   datetime lt; double lp;
-   double sum = SeriesProfitAndLastClose24h(key, lt, lp);
-
-   if(lt > 0)
+   // Series has ended (no positions remain). Optionally draw a label.
+   if(ShowBasketLabels)
    {
-      string dirStr = (dir > 0 ? "BUY" : "SELL");
-      string text = "[" + dirStr + " #" + IntegerToString(id) + "] ";
-      text += (sum >= 0 ? "+$" : "-$") + DoubleToString(MathAbs(sum), 2);
+      int id = CurrentSeriesId(dir);
+      string key = SeriesKey(dir, id);
 
-      double off = (dir > 0 ? -80 * _Point : +80 * _Point);
-      color  c   = (sum >= 0 ? clrLime : clrCrimson);
+      datetime lt; double lp;
+      double sum = SeriesProfitAndLastClose24h(key, lt, lp);
 
-      string nm = ObjName("S_" + (dir > 0 ? "B" : "S") + "_" + IntegerToString(id));
-      DrawProfitLabel(nm, lt, lp + off, text, c, 9, ANCHOR_CENTER);
+      if(lt > 0)
+      {
+         string dirStr = (dir > 0 ? "BUY" : "SELL");
+         string text = "[" + dirStr + " #" + IntegerToString(id) + "] ";
+         text += (sum >= 0 ? "+$" : "-$") + DoubleToString(MathAbs(sum), 2);
+
+         double off = (dir > 0 ? -80 * _Point : +80 * _Point);
+         color  c   = (sum >= 0 ? clrLime : clrCrimson);
+
+         string nm = ObjName("S_" + (dir > 0 ? "B" : "S") + "_" + IntegerToString(id));
+         DrawProfitLabel(nm, lt, lp + off, text, c, 9, ANCHOR_CENTER);
+      }
    }
 
+   // ALWAYS clear series-active flag — this is strategy state, not visual.
    SetSeriesActive(dir, false);
 }
 

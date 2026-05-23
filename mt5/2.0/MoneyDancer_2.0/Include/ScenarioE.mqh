@@ -231,7 +231,10 @@ void TryOpenRunner(int losingBasketDir, string reason)
    if(runnersLots >= maxAllowed) return;
 
    double remaining = maxAllowed - runnersLots;
-   double lot = MathMin(LotsBase, remaining);
+   // CR-I4 fix: use ComputeBaseLot() so runner sizing respects S1.5 equity
+   // scaling. Was raw LotsBase = baskets scale up but runners stayed at the
+   // input minimum (0.01) — making hedge-runners undersized on $100k+ accounts.
+   double lot = MathMin(ComputeBaseLot(), remaining);
    lot = ClampLot(lot);
    if(lot <= 0) return;
 

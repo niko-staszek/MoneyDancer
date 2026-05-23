@@ -130,8 +130,8 @@ datetime g_lastSellTime   = 0;
 // Last signal diagnostic info (read by Dashboard later)
 string   g_lastMode    = "SECOND";
 int      g_lastSigDir  = 0;
-int      g_lastPeak    = 0;
-int      g_lastMovePts = 0;
+// CR-I2: g_lastPeak + g_lastMovePts removed — written in Signal.mqh but
+// never read anywhere. Either wire into dashboard or drop. Dropped.
 
 //==================== DASHBOARD STATE (A7b) ====================
 // Visual-only. Strategy has no functional dependency on these.

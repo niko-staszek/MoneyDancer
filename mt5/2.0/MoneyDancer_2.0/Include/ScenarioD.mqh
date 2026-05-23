@@ -47,37 +47,7 @@ void ApplyBasketTPSeries(int dir, string seriesKey)
    }
 }
 
-//+------------------------------------------------------------------+
-//| Non-series variant (used by the old fast path; kept for          |
-//| backwards compat).                                                |
-//+------------------------------------------------------------------+
-void ApplyBasketTP(int dir)
-{
-   double be;
-   if(!CalcGroupBE(dir, be)) return;
-
-   double tp = (dir > 0 ? be + bePoints * _Point : be - bePoints * _Point);
-   tp = NormalizePrice(tp);
-
-   int total = PositionsTotal();
-   for(int i = total - 1; i >= 0; i--)
-   {
-      ulong ticket = PositionGetTicket(i);
-      if(ticket == 0) continue;
-      if(!IsMinePosition()) continue;
-      if(IsPyramidTicket(ticket)) continue;
-      if(IsRunner()) continue;
-
-      long typ = PositionGetInteger(POSITION_TYPE);
-      if(dir > 0 && typ != POSITION_TYPE_BUY)  continue;
-      if(dir < 0 && typ != POSITION_TYPE_SELL) continue;
-
-      double sl    = PositionGetDouble(POSITION_SL);
-      double curTP = PositionGetDouble(POSITION_TP);
-
-      if(MathAbs(curTP - tp) > (2 * _Point))
-         ModifyPositionSLTP(ticket, sl, tp);
-   }
-}
+// CR-M3: ApplyBasketTP non-series variant removed — never called from
+// 2.0 codebase. The series-aware variant (above) is the canonical path.
 
 #endif // __MD_SCENARIOD_MQH__
