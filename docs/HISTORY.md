@@ -387,6 +387,23 @@ After declaring backtest iteration exhausted, surfaced and addressed pre-live co
 
 **Backtest invariance**: all four pre-live features gated by `!MQLInfoInteger(MQL_TESTER)`. STEP backtest results unchanged. Verified via code review (no SUCCESS-path changes in trade.* wrappers).
 
+### 2026-05-23 — Code review (full pass, agent + manual triage)
+
+Dispatched Plan agent to read all 22 files (~6.5k LOC) and report findings by severity. Agent produced 4 critical + 11 important + 12 minor + 4 style issues. Triaged + fixed in priority order:
+
+- **All 4 CRITICAL fixed** (commit `153fe91`):
+  - C1: `EnforceBasketSL` ignored regime-aware overrides when base `MaxBasketLossPct=0` — silently disabled rail
+  - C2: `Dashboard.FinalizeSeriesIfEnded` left series-active stuck when `ShowBasketLabels=false` — next entry attached to dead series id
+  - C3: `Dashboard_Init` overwrote PL.1-loaded `g_peakEquityEver` — fragile to init reordering
+  - C4: Dead `IsMarketCurrentlyClosed()` pre-check (only checked permanent disable state, not session window)
+- **6 of 11 IMPORTANT fixed**: I1 (`g_basketSLDayKey` actually used), I2 (delete write-only state), I4 (runner sizing respects S1.5), I5 (Sunday added to weekend guard), I9 (pre-close also sweeps runners), I11 (doc comment placement)
+- **2 of 12 MINOR fixed**: M3, M4 (dead-code deletion)
+- 5 IMPORTANT + 10 MINOR + 4 STYLE deferred (lower priority; documented in `docs/CODE_REVIEW.md` § "Deferred")
+
+**Backtest-invariance verified empirically**: mar25 H1 cell with all fixes = $1850.91 / 22.18% DD / 1722 trades — **bit-identical** to STEP baseline. Fixes activate only outside STEP-backtest conditions (regime overrides off, ScenarioE off, DailyPreClose off, persistence tester-gated).
+
+Full report: `docs/CODE_REVIEW.md`. Per-fix code references via `CR-<ID>` comments.
+
 ---
 
 ## 4. Validated facts (knowledge we keep)
@@ -415,6 +432,8 @@ Things tested enough to bet on:
 | **Rail state MUST persist across EA restart on live.** Currently g_peakEquityEver, g_basketSLToday, g_tradePauseUntil, series anchors all reset on OnInit. Weekend close + Monday restart loses accumulated DD/counters. PL.1 fixes this via on-disk CSV; tester-invariant. | PL.1 (2026-05-23) |
 | **Order-send failures must be logged, not silent.** Default CTrade behavior returns false on failure but doesn't surface retcode. PL.2 adds `LogTradeFailure(op, ticket)` with retcode-to-string decoder so post-mortem analysis on live is possible. | PL.2 (2026-05-23) |
 | **Symbol specs must be verified at OnInit on live.** Cent vs standard account ambiguity could give wildly wrong lot sizing. PL.3 asserts contract_size/vol_min/digits/calc_mode at OnInit; refuses init if specs unexpected. | PL.3 (2026-05-23) |
+| **State mutation must NEVER be gated by visual-only flags.** `Dashboard.FinalizeSeriesIfEnded` had `if(!ShowBasketLabels) return;` BEFORE `SetSeriesActive(false)` — silently broke series lifecycle when labels were turned off. Always separate state-machine updates from visual rendering. | CR-C2 (2026-05-23) |
+| **Init-order races are bug-magnets.** `Dashboard_Init` unconditionally setting `g_peakEquityEver = ACCOUNT_EQUITY` worked only because of accidental include ordering vs PL.1's `LoadRailState`. Robust pattern: conditional set (`if value is uninitialized, then set`). | CR-C3 (2026-05-23) |
 
 ---
 

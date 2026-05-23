@@ -102,7 +102,7 @@ All shipped fixes were designed for backtest invariance. The activate conditions
 - I9: same — function returns immediately
 - M3, M4: no callers
 
-**Verification**: re-running STEP on mar25 H1 cell after fixes should match the +37.0% / 1722 trades baseline exactly. See `runs/CR_VERIFY-5k-mar25/` (in flight).
+**Verification result (commit `153fe91`, ran 2026-05-23)**: mar25 H1 cell with fixes = **$1850.91 / 22.18% DD / 1722 trades / PF 1.33** — **BIT-IDENTICAL** to STEP baseline. All 12 fixes confirmed backtest-invariant. The activate conditions don't trip in tester (overrides off, ScenarioE off, DailyPreClose off, persistence off). See `runs/CR_VERIFY-5k-mar25/result.yaml`.
 
 ---
 
