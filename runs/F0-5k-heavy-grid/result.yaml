@@ -1,0 +1,45 @@
+run_id: F0-5k-heavy-grid
+story_id: F0
+set_file: 
+symbol: XAUUSD
+account_size: 5000
+data_window: ['2026.01.01', '2026.01.31']
+metrics:
+  net_profit: 4393.24
+  profit_factor: 1.97
+  expected_payoff: 1.68
+  recovery_factor: 4.54
+  sharpe: 39.09
+  balance_dd_max: 505.38
+  balance_dd_rel: 8.68
+  equity_dd_max: 968.42
+  equity_dd_rel: 11.66
+  trades: 2619
+  profit_trades: 1764
+  loss_trades: 855
+  largest_profit_trade: null
+  largest_loss_trade: null
+  max_consec_losses: 9
+  initial_deposit: null
+raw_metrics:
+  balance_dd_max: 505.38
+  balance_dd_rel: 8.68
+  equity_dd_max: 968.42
+  equity_dd_rel: 11.66
+  expected_payoff: 1.68
+  gross_loss: -4506.2
+  gross_profit: 8899.44
+  loss_trades: 855
+  loss_trades_pct: 32.65
+  max_consec_losses: 9
+  max_consec_value_losses: -96.6
+  max_consec_value_wins: 12.64
+  max_consec_wins: 14
+  net_profit: 4393.24
+  profit_factor: 1.97
+  profit_trades: 1764
+  profit_trades_pct: 67.35
+  recovery_factor: 4.54
+  sharpe: 39.09
+  total_deals: 5238
+  total_trades: 2619

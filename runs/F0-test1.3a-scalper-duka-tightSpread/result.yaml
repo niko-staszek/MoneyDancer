@@ -1,0 +1,45 @@
+run_id: F0-test1.3a-scalper-duka
+story_id: F0
+set_file: 
+symbol: XAUUSD
+account_size: 100000
+data_window: ['2026.01.01', '2026.01.31']
+metrics:
+  net_profit: -1072.76
+  profit_factor: 0.21
+  expected_payoff: -6.31
+  recovery_factor: -0.78
+  sharpe: -5
+  balance_dd_max: 1288
+  balance_dd_rel: 1.29
+  equity_dd_max: 1383.57
+  equity_dd_rel: 1.38
+  trades: 170
+  profit_trades: 135
+  loss_trades: 35
+  largest_profit_trade: null
+  largest_loss_trade: null
+  max_consec_losses: 3
+  initial_deposit: null
+raw_metrics:
+  balance_dd_max: 1288
+  balance_dd_rel: 1.29
+  equity_dd_max: 1383.57
+  equity_dd_rel: 1.38
+  expected_payoff: -6.31
+  gross_loss: -1355.12
+  gross_profit: 282.36
+  loss_trades: 35
+  loss_trades_pct: 20.59
+  max_consec_losses: 3
+  max_consec_value_losses: -1226.12
+  max_consec_value_wins: 24.94
+  max_consec_wins: 15
+  net_profit: -1072.76
+  profit_factor: 0.21
+  profit_trades: 135
+  profit_trades_pct: 79.41
+  recovery_factor: -0.78
+  sharpe: -5
+  total_deals: 340
+  total_trades: 170

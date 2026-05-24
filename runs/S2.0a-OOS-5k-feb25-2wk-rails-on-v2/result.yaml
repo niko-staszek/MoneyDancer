@@ -1,0 +1,45 @@
+run_id: feb25-v2
+story_id: F0
+set_file: 
+symbol: XAUUSD.duk_robo_2025
+account_size: 5000
+data_window: ['2025.02.01', '2025.02.14']
+metrics:
+  net_profit: -595.1
+  profit_factor: 0.89
+  expected_payoff: -0.42
+  recovery_factor: -0.27
+  sharpe: -3.55
+  balance_dd_max: 2111.07
+  balance_dd_rel: 37.47
+  equity_dd_max: 2170.75
+  equity_dd_rel: 38.64
+  trades: 1421
+  profit_trades: 996
+  loss_trades: 425
+  largest_profit_trade: null
+  largest_loss_trade: null
+  max_consec_losses: 8
+  initial_deposit: null
+raw_metrics:
+  balance_dd_max: 2111.07
+  balance_dd_rel: 37.47
+  equity_dd_max: 2170.75
+  equity_dd_rel: 38.64
+  expected_payoff: -0.42
+  gross_loss: -5551.26
+  gross_profit: 4956.16
+  loss_trades: 425
+  loss_trades_pct: 29.91
+  max_consec_losses: 8
+  max_consec_value_losses: -174.15
+  max_consec_value_wins: 12.25
+  max_consec_wins: 14
+  net_profit: -595.1
+  profit_factor: 0.89
+  profit_trades: 996
+  profit_trades_pct: 70.09
+  recovery_factor: -0.27
+  sharpe: -3.55
+  total_deals: 2842
+  total_trades: 1421

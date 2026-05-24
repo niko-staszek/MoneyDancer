@@ -1,0 +1,45 @@
+run_id: S1-validate-AprMay-rails-on
+story_id: F0
+set_file: 
+symbol: XAUUSD.duk_robo
+account_size: 5000
+data_window: ['2026.04.01', '2026.05.14']
+metrics:
+  net_profit: 0
+  profit_factor: 0
+  expected_payoff: 0
+  recovery_factor: 0
+  sharpe: 0
+  balance_dd_max: 0
+  balance_dd_rel: 0
+  equity_dd_max: 0
+  equity_dd_rel: 0
+  trades: 0
+  profit_trades: 0
+  loss_trades: 0
+  largest_profit_trade: null
+  largest_loss_trade: null
+  max_consec_losses: 0
+  initial_deposit: null
+raw_metrics:
+  balance_dd_max: 0
+  balance_dd_rel: 0
+  equity_dd_max: 0
+  equity_dd_rel: 0
+  expected_payoff: 0
+  gross_loss: 0
+  gross_profit: 0
+  loss_trades: 0
+  loss_trades_pct: 0
+  max_consec_losses: 0
+  max_consec_value_losses: 0
+  max_consec_value_wins: 0
+  max_consec_wins: 0
+  net_profit: 0
+  profit_factor: 0
+  profit_trades: 0
+  profit_trades_pct: 0
+  recovery_factor: 0
+  sharpe: 0
+  total_deals: 0
+  total_trades: 0

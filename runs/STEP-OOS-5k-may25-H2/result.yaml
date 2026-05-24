@@ -1,0 +1,45 @@
+run_id: STEP-OOS-5k-may25-H2
+story_id: F0
+set_file: 
+symbol: XAUUSD
+account_size: 5000
+data_window: ['', '']
+metrics:
+  net_profit: 6490.17
+  profit_factor: 1.56
+  expected_payoff: 1.9
+  recovery_factor: 2.68
+  sharpe: 13.09
+  balance_dd_max: 1766.81
+  balance_dd_rel: 29.53
+  equity_dd_max: 2425.77
+  equity_dd_rel: 40.48
+  trades: 3418
+  profit_trades: 2349
+  loss_trades: 1069
+  largest_profit_trade: null
+  largest_loss_trade: null
+  max_consec_losses: 9
+  initial_deposit: null
+raw_metrics:
+  balance_dd_max: 1766.81
+  balance_dd_rel: 29.53
+  equity_dd_max: 2425.77
+  equity_dd_rel: 40.48
+  expected_payoff: 1.9
+  gross_loss: -11633.7
+  gross_profit: 18123.9
+  loss_trades: 1069
+  loss_trades_pct: 31.28
+  max_consec_losses: 9
+  max_consec_value_losses: -684.76
+  max_consec_value_wins: 19.38
+  max_consec_wins: 16
+  net_profit: 6490.17
+  profit_factor: 1.56
+  profit_trades: 2349
+  profit_trades_pct: 68.72
+  recovery_factor: 2.68
+  sharpe: 13.09
+  total_deals: 6836
+  total_trades: 3418

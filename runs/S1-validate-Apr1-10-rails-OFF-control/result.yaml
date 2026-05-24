@@ -1,0 +1,45 @@
+run_id: S1-validate-Apr1-10-rails-OFF-control
+story_id: F0
+set_file: 
+symbol: XAUUSD.duk_robo
+account_size: 5000
+data_window: ['2026.04.01', '2026.04.10']
+metrics:
+  net_profit: -63994.6
+  profit_factor: 0.4
+  expected_payoff: -12.36
+  recovery_factor: -0.33
+  sharpe: 3.86
+  balance_dd_max: 93238.7
+  balance_dd_rel: 272.28
+  equity_dd_max: 192802
+  equity_dd_rel: 550.78
+  trades: 5177
+  profit_trades: 3821
+  loss_trades: 1356
+  largest_profit_trade: null
+  largest_loss_trade: null
+  max_consec_losses: 7
+  initial_deposit: null
+raw_metrics:
+  balance_dd_max: 93238.7
+  balance_dd_rel: 272.28
+  equity_dd_max: 192802
+  equity_dd_rel: 550.78
+  expected_payoff: -12.36
+  gross_loss: -107161
+  gross_profit: 43166.2
+  loss_trades: 1356
+  loss_trades_pct: 26.19
+  max_consec_losses: 7
+  max_consec_value_losses: -1657.31
+  max_consec_value_wins: 17.79
+  max_consec_wins: 23
+  net_profit: -63994.6
+  profit_factor: 0.4
+  profit_trades: 3821
+  profit_trades_pct: 73.81
+  recovery_factor: -0.33
+  sharpe: 3.86
+  total_deals: 10354
+  total_trades: 5177

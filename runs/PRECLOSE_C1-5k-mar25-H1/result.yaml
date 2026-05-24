@@ -1,0 +1,45 @@
+run_id: PRECLOSE_C1-5k-mar25-H1
+story_id: F0
+set_file: 
+symbol: XAUUSD
+account_size: 5000
+data_window: ['', '']
+metrics:
+  net_profit: 1635.9
+  profit_factor: 1.3
+  expected_payoff: 0.97
+  recovery_factor: 1.15
+  sharpe: 7.05
+  balance_dd_max: 1005.22
+  balance_dd_rel: 17.54
+  equity_dd_max: 1427.13
+  equity_dd_rel: 24.03
+  trades: 1679
+  profit_trades: 1156
+  loss_trades: 523
+  largest_profit_trade: null
+  largest_loss_trade: null
+  max_consec_losses: 6
+  initial_deposit: null
+raw_metrics:
+  balance_dd_max: 1005.22
+  balance_dd_rel: 17.54
+  equity_dd_max: 1427.13
+  equity_dd_rel: 24.03
+  expected_payoff: 0.97
+  gross_loss: -5534.24
+  gross_profit: 7170.14
+  loss_trades: 523
+  loss_trades_pct: 31.15
+  max_consec_losses: 6
+  max_consec_value_losses: -485.37
+  max_consec_value_wins: 31.71
+  max_consec_wins: 19
+  net_profit: 1635.9
+  profit_factor: 1.3
+  profit_trades: 1156
+  profit_trades_pct: 68.85
+  recovery_factor: 1.15
+  sharpe: 7.05
+  total_deals: 3358
+  total_trades: 1679

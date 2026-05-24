@@ -1,0 +1,45 @@
+run_id: S2.0a-OOS-5k-apr25-2wk-rails-on
+story_id: F0
+set_file: 
+symbol: XAUUSD.duk_robo_2025
+account_size: 5000
+data_window: ['2025.04.01', '2025.04.14']
+metrics:
+  net_profit: 13602.7
+  profit_factor: 2.2
+  expected_payoff: 2.95
+  recovery_factor: 4.1
+  sharpe: 21.38
+  balance_dd_max: 2633.1
+  balance_dd_rel: 15.38
+  equity_dd_max: 3321.34
+  equity_dd_rel: 20.41
+  trades: 4609
+  profit_trades: 3291
+  loss_trades: 1318
+  largest_profit_trade: null
+  largest_loss_trade: null
+  max_consec_losses: 7
+  initial_deposit: null
+raw_metrics:
+  balance_dd_max: 2633.1
+  balance_dd_rel: 15.38
+  equity_dd_max: 3321.34
+  equity_dd_rel: 20.41
+  expected_payoff: 2.95
+  gross_loss: -11289
+  gross_profit: 24891.7
+  loss_trades: 1318
+  loss_trades_pct: 28.6
+  max_consec_losses: 7
+  max_consec_value_losses: -1303.82
+  max_consec_value_wins: 14.53
+  max_consec_wins: 18
+  net_profit: 13602.7
+  profit_factor: 2.2
+  profit_trades: 3291
+  profit_trades_pct: 71.4
+  recovery_factor: 4.1
+  sharpe: 21.38
+  total_deals: 9218
+  total_trades: 4609

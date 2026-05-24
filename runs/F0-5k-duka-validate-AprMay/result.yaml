@@ -1,0 +1,45 @@
+run_id: F0-5k-duka-validate-AprMay
+story_id: F0
+set_file: 
+symbol: XAUUSD
+account_size: 5000
+data_window: ['2026.04.01', '2026.05.14']
+metrics:
+  net_profit: -21464
+  profit_factor: 0.05
+  expected_payoff: -103.69
+  recovery_factor: -0.95
+  sharpe: 228.03
+  balance_dd_max: 22063
+  balance_dd_rel: 394.05
+  equity_dd_max: 22476.3
+  equity_dd_rel: 407.13
+  trades: 207
+  profit_trades: 133
+  loss_trades: 74
+  largest_profit_trade: null
+  largest_loss_trade: null
+  max_consec_losses: 10
+  initial_deposit: null
+raw_metrics:
+  balance_dd_max: 22063
+  balance_dd_rel: 394.05
+  equity_dd_max: 22476.3
+  equity_dd_rel: 407.13
+  expected_payoff: -103.69
+  gross_loss: -22610.8
+  gross_profit: 1146.88
+  loss_trades: 74
+  loss_trades_pct: 35.75
+  max_consec_losses: 10
+  max_consec_value_losses: -21982.5
+  max_consec_value_wins: 13.48
+  max_consec_wins: 10
+  net_profit: -21464
+  profit_factor: 0.05
+  profit_trades: 133
+  profit_trades_pct: 64.25
+  recovery_factor: -0.95
+  sharpe: 228.03
+  total_deals: 414
+  total_trades: 207

@@ -1,0 +1,45 @@
+run_id: S2.0a-OOS-FULL-5k-feb25-2wk
+story_id: F0
+set_file: 
+symbol: XAUUSD.duk_robo_2025
+account_size: 5000
+data_window: ['2025.02.01', '2025.02.14']
+metrics:
+  net_profit: 440.53
+  profit_factor: 1.34
+  expected_payoff: 0.99
+  recovery_factor: 0.82
+  sharpe: 7.79
+  balance_dd_max: 449.45
+  balance_dd_rel: 7.63
+  equity_dd_max: 536.38
+  equity_dd_rel: 9.07
+  trades: 447
+  profit_trades: 313
+  loss_trades: 134
+  largest_profit_trade: null
+  largest_loss_trade: null
+  max_consec_losses: 4
+  initial_deposit: null
+raw_metrics:
+  balance_dd_max: 449.45
+  balance_dd_rel: 7.63
+  equity_dd_max: 536.38
+  equity_dd_rel: 9.07
+  expected_payoff: 0.99
+  gross_loss: -1314.17
+  gross_profit: 1754.7
+  loss_trades: 134
+  loss_trades_pct: 29.98
+  max_consec_losses: 4
+  max_consec_value_losses: -449.45
+  max_consec_value_wins: 26.06
+  max_consec_wins: 15
+  net_profit: 440.53
+  profit_factor: 1.34
+  profit_trades: 313
+  profit_trades_pct: 70.02
+  recovery_factor: 0.82
+  sharpe: 7.79
+  total_deals: 894
+  total_trades: 447

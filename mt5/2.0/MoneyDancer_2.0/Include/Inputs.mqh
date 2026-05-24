@@ -302,7 +302,7 @@ input int              MMDPeriod_Green    = 1440;
 input int              MMDPeriod_Purple   = 3456;   // slow cloud
 
 //==================== DAILY RISK LOCKS ====================
-input string __risk_sep__                 = "══════ DAILY RISK LOCKS ══════";
+input string __sec_daily_risk__                 = "══════ DAILY RISK LOCKS ══════";
 // Max Daily Profit: enter 1..999 (1=1% increase in BALANCE relative to the baseline at 01:00); 0 = OFF
 input int    MaxDailyProfitPct            = 0;      // Daily Profit (0=OFF, 1..999=%)
 input int    DailyBaselineHour            = 1;      // Hour baseline (default 01:00)
@@ -334,7 +334,7 @@ input int    RiskFromCurrentProfitUntilMinute = 30;    // Lock time - Minute
 //==================== TOTAL PROFIT TARGET (1.1) ====================
 // Stop trading once today's total P/L (realized + floating) hits the target.
 // Daily reset: pauses until next server-time 00:00, like the other daily locks.
-input string __profit_target_sep__       = "══════ TOTAL PROFIT TARGET ══════";
+input string __sec_profit_target__       = "══════ TOTAL PROFIT TARGET ══════";
 enum ENUM_PROFIT_TARGET_MODE
 {
    PROFIT_TARGET_OFF = 0,   // Off
@@ -356,7 +356,7 @@ input double SiphonPct             = 0.90;
 input double MinPartialCloseLot    = 0.01;
 
 //==================== DASHBOARD ====================
-input string __dash_sep__          = "══════ DASHBOARD ══════";
+input string __sec_dashboard__          = "══════ DASHBOARD ══════";
 input bool   ShowProDashboard      = true;
 input int    DashboardX            = 20;
 input int    DashboardY            = 30;
@@ -366,7 +366,7 @@ input color  DashProfitColor       = clrLime;
 input color  DashLossColor         = clrCrimson;
 
 //==================== MODERN MARKERS ====================
-input string __mark_sep__          = "══════ MODERN MARKERS ══════";
+input string __sec_markers__          = "══════ MODERN MARKERS ══════";
 input bool   ShowModernMarkers     = true;
 input bool   ShowBasketLabels      = true;
 input bool   ShowBottomResults     = true;

@@ -1,0 +1,45 @@
+run_id: PRECLOSE_C6-OOS-5k-dec25-H2
+story_id: F0
+set_file: 
+symbol: XAUUSD
+account_size: 5000
+data_window: ['', '']
+metrics:
+  net_profit: 3105.83
+  profit_factor: 1.33
+  expected_payoff: 1.03
+  recovery_factor: 1.19
+  sharpe: 11.86
+  balance_dd_max: 2390.8
+  balance_dd_rel: 23.13
+  equity_dd_max: 2599.84
+  equity_dd_rel: 25.14
+  trades: 3003
+  profit_trades: 2129
+  loss_trades: 874
+  largest_profit_trade: null
+  largest_loss_trade: null
+  max_consec_losses: 7
+  initial_deposit: null
+raw_metrics:
+  balance_dd_max: 2390.8
+  balance_dd_rel: 23.13
+  equity_dd_max: 2599.84
+  equity_dd_rel: 25.14
+  expected_payoff: 1.03
+  gross_loss: -9500.66
+  gross_profit: 12606.5
+  loss_trades: 874
+  loss_trades_pct: 29.1
+  max_consec_losses: 7
+  max_consec_value_losses: -784.44
+  max_consec_value_wins: 32.32
+  max_consec_wins: 15
+  net_profit: 3105.83
+  profit_factor: 1.33
+  profit_trades: 2129
+  profit_trades_pct: 70.9
+  recovery_factor: 1.19
+  sharpe: 11.86
+  total_deals: 6006
+  total_trades: 3003

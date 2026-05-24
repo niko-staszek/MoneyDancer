@@ -1,0 +1,9 @@
+F0 batch — started 2026-05-15 00:35:15
+window: 2026.01.01 → 2026.01.31
+symbol: XAUUSD.duk  period: M5
+
+[F0-35k-pyramid-duka] rc=0 elapsed=386s report=YES deposit=$35000
+[F0-3k-heavy-pyramid-duka] rc=0 elapsed=734s report=YES deposit=$3000
+[F0-5k-heavy-grid-duka] rc=0 elapsed=1038s report=YES deposit=$5000
+
+[batch] total elapsed 2158s (36.0 min)

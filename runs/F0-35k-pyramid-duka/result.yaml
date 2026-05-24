@@ -1,0 +1,45 @@
+run_id: F0-35k-pyramid-duka
+story_id: F0
+set_file: 
+symbol: XAUUSD
+account_size: 35000
+data_window: ['2026.01.01', '2026.01.31']
+metrics:
+  net_profit: 5288.05
+  profit_factor: 1.25
+  expected_payoff: 12.8
+  recovery_factor: 0.31
+  sharpe: 0.62
+  balance_dd_max: 9088.57
+  balance_dd_rel: 19.76
+  equity_dd_max: 16965.3
+  equity_dd_rel: 47.03
+  trades: 413
+  profit_trades: 296
+  loss_trades: 117
+  largest_profit_trade: null
+  largest_loss_trade: null
+  max_consec_losses: 20
+  initial_deposit: null
+raw_metrics:
+  balance_dd_max: 9088.57
+  balance_dd_rel: 19.76
+  equity_dd_max: 16965.3
+  equity_dd_rel: 47.03
+  expected_payoff: 12.8
+  gross_loss: -20858.6
+  gross_profit: 26146.7
+  loss_trades: 117
+  loss_trades_pct: 28.33
+  max_consec_losses: 20
+  max_consec_value_losses: -6974.23
+  max_consec_value_wins: 492.55
+  max_consec_wins: 20
+  net_profit: 5288.05
+  profit_factor: 1.25
+  profit_trades: 296
+  profit_trades_pct: 71.67
+  recovery_factor: 0.31
+  sharpe: 0.62
+  total_deals: 826
+  total_trades: 413

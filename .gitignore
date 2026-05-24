@@ -6,3 +6,20 @@
 
 # Claude Code — keep entire config out of public repo
 .claude/
+
+# Backtest artifacts — keep only structured metrics (result.yaml) and
+# decision memos (runs/decisions/). Everything else under per-run folders
+# (HTML reports, PNG charts, raw INI configs, .set snapshots, .raw.json)
+# is ephemeral output that bloats the repo (~96 GB currently).
+runs/*/*
+!runs/*/result.yaml
+!runs/decisions/
+!runs/decisions/**
+
+# Dukascopy tick cache — ~20 GB binary blob, regenerable via duka_fetch.py
+data/
+
+# One-shot compile-output logs from CR / PL.* deploys
+runs/compile_*.log
+runs/_*_log.txt
+runs/_*_sample_log.txt

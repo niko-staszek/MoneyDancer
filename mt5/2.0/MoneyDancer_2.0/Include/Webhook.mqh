@@ -19,7 +19,7 @@
 #define __MD_WEBHOOK_MQH__
 
 // Tracks last day we pushed so we only fire once per day.
-int g_webhook_lastPushDayKey = -1;
+int g_webhookLastPushDayKey = -1;
 
 bool IsTelegramUrl(string url)
 {
@@ -131,10 +131,10 @@ void WebhookCheckAndFire()
 
    // Once per day
    int dk = DayKey(now);
-   if(g_webhook_lastPushDayKey == dk) return;
+   if(g_webhookLastPushDayKey == dk) return;
 
    if(WebhookPostEod())
-      g_webhook_lastPushDayKey = dk;
+      g_webhookLastPushDayKey = dk;
 }
 
 #endif // __MD_WEBHOOK_MQH__

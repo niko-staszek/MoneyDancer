@@ -1,0 +1,45 @@
+run_id: PRECLOSE22-5k-feb25-H1
+story_id: F0
+set_file: 
+symbol: XAUUSD
+account_size: 5000
+data_window: ['', '']
+metrics:
+  net_profit: -590.1
+  profit_factor: 0.91
+  expected_payoff: -0.37
+  recovery_factor: -0.22
+  sharpe: -3.67
+  balance_dd_max: 2514.14
+  balance_dd_rel: 36.97
+  equity_dd_max: 2637.85
+  equity_dd_rel: 38.7
+  trades: 1603
+  profit_trades: 1135
+  loss_trades: 468
+  largest_profit_trade: null
+  largest_loss_trade: null
+  max_consec_losses: 5
+  initial_deposit: null
+raw_metrics:
+  balance_dd_max: 2514.14
+  balance_dd_rel: 36.97
+  equity_dd_max: 2637.85
+  equity_dd_rel: 38.7
+  expected_payoff: -0.37
+  gross_loss: -6216.36
+  gross_profit: 5626.26
+  loss_trades: 468
+  loss_trades_pct: 29.2
+  max_consec_losses: 5
+  max_consec_value_losses: -520.79
+  max_consec_value_wins: 29.5
+  max_consec_wins: 20
+  net_profit: -590.1
+  profit_factor: 0.91
+  profit_trades: 1135
+  profit_trades_pct: 70.8
+  recovery_factor: -0.22
+  sharpe: -3.67
+  total_deals: 3206
+  total_trades: 1603

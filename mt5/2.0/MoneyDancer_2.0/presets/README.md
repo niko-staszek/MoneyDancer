@@ -1,5 +1,14 @@
 # MoneyDancer 2.0 — Ship presets
 
+## Files in this folder (post-cleanup 2026-05-24)
+
+| File | Status | Use case |
+|---|---|---|
+| **`XAUUSD_2.0_STEP_ship.set`** | **CURRENT SHIP** | Cent forward deploy. Validated 28/32 cells, +90.2% mean. |
+| `XAUUSD_2.0_STEP_PRECLOSE_ship.set` | Opt-in variant | Users prioritizing prop-firm DD bound over max profit. Drops $6k vs STEP on combined H1+H2 but tighter DD on may25-H2-style cells. See HISTORY § S2.C.8. |
+| `XAUUSD_2.0_WT_ship.set` | Historical (lineage) | Pre-STEP ship (was filenamed S17 incorrectly — renamed 2026-05-24). 17/17 positive, +63.8% mean. |
+| `legacy/XAUUSD_2.0_BASELINE_export.set` | Archive | Stale baseline export with license-stub junk. Kept for forensic reference only. |
+
 ## Active ship: `XAUUSD_2.0_STEP_ship.set`
 
 The current production-ready config. Use this for cent forward test and live deployment.
