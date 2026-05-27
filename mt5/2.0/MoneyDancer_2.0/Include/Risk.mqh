@@ -242,8 +242,8 @@ int CloseSeriesBasketPositions_S10(int dir, string seriesKey)
 // SYMBOL_TRADE_MODE_DISABLED is a permanent state not a session window —
 // the pre-check was dead code in practice. The post-attempt error path
 // (line ~290) is the real market-closed handler.
-datetime g_basketSLMarketClosedLogged_Buy  = 0;
-datetime g_basketSLMarketClosedLogged_Sell = 0;
+datetime g_basketSLMarketClosedLoggedBuy  = 0;
+datetime g_basketSLMarketClosedLoggedSell = 0;
 
 void EnforceBasketSL_Dir(int dir)
 {
@@ -271,14 +271,14 @@ void EnforceBasketSL_Dir(int dir)
          int err = GetLastError();
          if(err == 4756 || err == 132 /*ERR_MARKET_CLOSED variants*/)
          {
-            datetime lastLog2 = (dir > 0 ? g_basketSLMarketClosedLogged_Buy : g_basketSLMarketClosedLogged_Sell);
+            datetime lastLog2 = (dir > 0 ? g_basketSLMarketClosedLoggedBuy : g_basketSLMarketClosedLoggedSell);
             datetime now2 = TimeCurrent();
             if(lastLog2 == 0 || (now2 - lastLog2) > 300)
             {
                PrintFormat("[S1.0] market-closed error %d — basket SL deferred (dir=%+d, eq=%.2f)",
                            err, dir, AccountInfoDouble(ACCOUNT_EQUITY));
-               if(dir > 0) g_basketSLMarketClosedLogged_Buy = now2;
-               else        g_basketSLMarketClosedLogged_Sell = now2;
+               if(dir > 0) g_basketSLMarketClosedLoggedBuy = now2;
+               else        g_basketSLMarketClosedLoggedSell = now2;
             }
             return;
          }

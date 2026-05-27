@@ -48,29 +48,38 @@ Function naming is **consistent and clear**. No deferred work here.
 
 ---
 
-## Deferred refactors
+## Completed refactors (2026-05-24, "3.0 naming refactor")
 
-These are **acknowledged but not fixed** because the risk/reward is unfavorable right now:
+The deferred items have been DONE. The naming refactor was applied in-place to `mt5/2.0/MoneyDancer_2.0/` via `scripts/_naming_refactor.py` (305 substitutions across 16 files, word-boundary-safe).
 
-### Legacy camelCase inputs (~15 fields)
+### What was renamed
 
-Examples: `maPeriod`, `slopeLookbackBars`, `slopeThresholdPts`, `strongTrendPts`, `startBe`, `lotMultiplier`, `lotMultiplierRange`, `bePoints`, `maxLot`.
+**Inputs (61 renames)**:
+- camelCase → PascalCase (9): `maPeriod→MAPeriod`, `slopeLookbackBars→SlopeLookbackBars`, `slopeThresholdPts→SlopeThresholdPts`, `strongTrendPts→StrongTrendPts`, `startBe→StartBE`, `lotMultiplier→LotMultiplier`, `lotMultiplierRange→LotMultiplierRange`, `bePoints→BEPoints`, `maxLot→MaxLot`
+- PascalCase_underscore → PascalCase (52): all `Mon/Tue/Wed/Thu/Fri Start/End 1/2 Hour/Minute` (40), `TP_Points→TPPoints`, `SL_Points→SLPoints`, `MaxBasketDD_Pct→MaxBasketDDPct`, `MaxEquityDD_Pct→MaxEquityDDPct`, `RunnerBE_StartPts→RunnerBEStartPts`, `MMDPeriod_{Red,Orange,LBlue,Blue,LGreen,Green,Purple}→MMDPeriod...` (7)
 
-**Why deferred**: Renaming changes the `.set` file schema. Every user-saved `.set` file (including our shipped `XAUUSD_2.0_STEP_ship.set`) would silently load defaults for renamed inputs after a rename. The strategic damage is real money on a wrong config.
+**Globals (22 renames)**:
+- `g_ma_handle_main→g_maHandleMain`, `g_ma_handle_pyram→g_maHandlePyram`
+- `g_mmd_*` → `g_mmd*` family (8)
+- `g_spread_*` → `g_spread*` family (4)
+- `g_hour_blocked→g_hourBlocked`, `g_hour_block_parsed→g_hourBlockParsed`
+- `g_news_*` → `g_news*` family (4)
+- `g_basketSLMarketClosedLogged_{Buy,Sell}→g_basketSLMarketClosedLogged{Buy,Sell}`
+- `g_tele_file→g_teleFile`, `g_tele_dayKey→g_teleDayKey`
 
-**Future refactor path**: when we cut a `3.0` MAJOR version with a deliberate breaking-change bump, rename and ship migration guide.
+### Breaking change for users
 
-### Legacy PascalCase_underscore inputs (~10 fields)
+Any `.set` file using old input names will silently load defaults for renamed inputs after this refactor.
 
-Examples: `MonStart1_Hour`, `TP_Points`, `SL_Points`, `MaxBasketDD_Pct`, `MaxEquityDD_Pct`, `RunnerBE_StartPts`.
+**Migration**: open the .set file in a text editor and apply these renames:
+- Lower-case-start → upper-case-start the 9 camelCase legacy inputs
+- Drop the underscore in 52 underscore-separated inputs
 
-**Why deferred**: Same — breaks `.set` files. Same path: bump to 3.0 to consolidate.
+OR re-export from the EA after the upgrade. The shipped `.set` files in `presets/` were already migrated by `scripts/_rename_set_file.py` so direct users get the new names automatically.
 
-### Snake-case global variables (~10 vars)
+### Verification
 
-`g_mmd_periods[]`, `g_mmd_hSMA[]`, `g_mmd_hEMA[]`, `g_news_events[]`, `g_spread_t[]`, `g_spread_v[]`, `g_hour_blocked[]`, `g_tele_file`, `g_tele_dayKey`, `g_webhook_lastPushDayKey`.
-
-**Why deferred**: All purely internal; refactor is mechanical (~30 min) but cross-cuts 6 modules. Low risk but currently no behavior payoff. Park as a `cleanup/naming` ticket; do when next touching one of those modules anyway.
+`mar25 H1 STEP` re-run after rename = bit-identical to baseline ($1850.91 / 22.18% DD / 1722 trades). No functional change; pure rename + comment cleanup.
 
 ---
 

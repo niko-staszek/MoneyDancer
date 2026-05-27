@@ -4,7 +4,7 @@
 //|                                                                   |
 //| Rules (preserved from MT4):                                       |
 //|  - Pyramid is always single-direction (no hedging inside).        |
-//|  - Trigger = TP distance level (TP_Points) from the position's    |
+//|  - Trigger = TP distance level (TPPoints) from the position's    |
 //|    open price. Next pyramid add is allowed once price crosses     |
 //|    the last add's trigger.                                        |
 //|  - BUILDING (slope agrees with direction): all positions TP=0     |
@@ -338,7 +338,7 @@ void PyramidManage()
             long   typ = PositionGetInteger(POSITION_TYPE);
             int    dir = (typ == POSITION_TYPE_BUY ? +1 : -1);
             double op  = PositionGetDouble(POSITION_PRICE_OPEN);
-            double tp  = (dir > 0 ? op + TP_Points * _Point : op - TP_Points * _Point);
+            double tp  = (dir > 0 ? op + TPPoints * _Point : op - TPPoints * _Point);
             double sl  = PositionGetDouble(POSITION_SL);
             ModifyPositionSLTP(t, sl, tp);
          }
@@ -372,7 +372,7 @@ void PyramidManage()
          if(PositionSelectByTicket(t))
          {
             double op = PositionGetDouble(POSITION_PRICE_OPEN);
-            double tp = (dir > 0 ? op + TP_Points * _Point : op - TP_Points * _Point);
+            double tp = (dir > 0 ? op + TPPoints * _Point : op - TPPoints * _Point);
             double sl = PositionGetDouble(POSITION_SL);
             ModifyPositionSLTP(t, sl, tp);
          }
@@ -459,7 +459,7 @@ void PyramidOnNewPosition(ulong ticket)
 
    int    idx     = PyrNextIndex();
    double op      = PositionGetDouble(POSITION_PRICE_OPEN);
-   double trigger = (dir > 0 ? op + TP_Points * _Point : op - TP_Points * _Point);
+   double trigger = (dir > 0 ? op + TPPoints * _Point : op - TPPoints * _Point);
    trigger = NormalizePrice(trigger);
 
    PyrAddOrUpdate(ticket, trigger, 0, PositionGetDouble(POSITION_SL), idx);

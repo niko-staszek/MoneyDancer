@@ -505,21 +505,21 @@ void UpdateAISimulation()
    if(g_aiConfidence > 95) g_aiConfidence = 95;
 
    // Pattern Recognition
-   if(slopePts > strongTrendPts)                     g_aiPattern = "STRONG TREND";
-   else if(slopePts > slopeThresholdPts)             g_aiPattern = "MOMENTUM BURST";
+   if(slopePts > StrongTrendPts)                     g_aiPattern = "STRONG TREND";
+   else if(slopePts > SlopeThresholdPts)             g_aiPattern = "MOMENTUM BURST";
    else if(tickRate > TickRateThreshold * 1.5)       g_aiPattern = "HIGH ACTIVITY";
    else if(spread > MaxSpreadPts * 0.8)              g_aiPattern = "SPREAD WARNING";
    else                                              g_aiPattern = "CONSOLIDATION";
 
    // Market Regime
-   if(slopePts > strongTrendPts)                     g_marketRegime = "TRENDING";
+   if(slopePts > StrongTrendPts)                     g_marketRegime = "TRENDING";
    else if(tickRate > TickRateThreshold * 2)         g_marketRegime = "VOLATILE";
    else                                              g_marketRegime = "RANGING";
 
    // Risk Level
    double ddPct = g_maxDDToday;
-   if(ddPct > MaxEquityDD_Pct * 0.7)      g_riskLevel = 2;
-   else if(ddPct > MaxEquityDD_Pct * 0.3) g_riskLevel = 1;
+   if(ddPct > MaxEquityDDPct * 0.7)      g_riskLevel = 2;
+   else if(ddPct > MaxEquityDDPct * 0.3) g_riskLevel = 1;
    else                                   g_riskLevel = 0;
 
    // Trade Quality Score
@@ -820,11 +820,11 @@ void DrawProDashboard()
 
    // Right column
    DrawLabel(ObjName("D_L4"), x + w/2 + 10,  y + 25, "MAX DD TODAY:", textMuted, 8, "Arial");
-   color ddTClr = (g_maxDDToday > MaxEquityDD_Pct * 0.5 ? lossRed : textBright);
+   color ddTClr = (g_maxDDToday > MaxEquityDDPct * 0.5 ? lossRed : textBright);
    DrawLabel(ObjName("D_V4"), x + w/2 + 110, y + 25, DoubleToString(g_maxDDToday, 2) + "%", ddTClr, 9, "Consolas");
 
    DrawLabel(ObjName("D_L5"), x + w/2 + 10,  y + 42, "MAX DD EVER:", textMuted, 8, "Arial");
-   color ddEClr = (g_maxDDEver > MaxEquityDD_Pct ? lossRed : textBright);
+   color ddEClr = (g_maxDDEver > MaxEquityDDPct ? lossRed : textBright);
    DrawLabel(ObjName("D_V5"), x + w/2 + 110, y + 42, DoubleToString(g_maxDDEver, 2) + "%", ddEClr, 9, "Consolas");
 
    DrawLabel(ObjName("D_L6"), x + w/2 + 10,  y + 59, "PATTERN:",     textMuted, 8, "Arial");

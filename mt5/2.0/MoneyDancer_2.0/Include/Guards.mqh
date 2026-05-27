@@ -14,19 +14,19 @@
 // ----- S1.4 spread-spike ring buffer -----
 #define SPREAD_RING_MAX 4096
 
-datetime g_spread_t[SPREAD_RING_MAX];
-int      g_spread_pts[SPREAD_RING_MAX];
-int      g_spread_n = 0;
-int      g_spread_head = 0;
+datetime g_spreadT[SPREAD_RING_MAX];
+int      g_spreadPts[SPREAD_RING_MAX];
+int      g_spreadN = 0;
+int      g_spreadHead = 0;
 
 // ----- S2.0 parsed hour-block list -----
-bool g_hour_blocked[24];
-bool g_hour_block_parsed = false;
+bool g_hourBlocked[24];
+bool g_hourBlockParsed = false;
 
 void Guards_ParseHourBlockList()
 {
-   ArrayInitialize(g_hour_blocked, false);
-   g_hour_block_parsed = true;
+   ArrayInitialize(g_hourBlocked, false);
+   g_hourBlockParsed = true;
    if(StringLen(HourBlockList) == 0) return;
    string parts[];
    int n = StringSplit(HourBlockList, ',', parts);
@@ -35,14 +35,14 @@ void Guards_ParseHourBlockList()
       string s = parts[i];
       StringTrimLeft(s); StringTrimRight(s);
       int h = (int)StringToInteger(s);
-      if(h >= 0 && h <= 23) g_hour_blocked[h] = true;
+      if(h >= 0 && h <= 23) g_hourBlocked[h] = true;
    }
 }
 
 void Guards_Init()
 {
-   g_spread_n = 0;
-   g_spread_head = 0;
+   g_spreadN = 0;
+   g_spreadHead = 0;
    Guards_ParseHourBlockList();
 }
 
@@ -59,18 +59,18 @@ void Guards_OnTick()
 
    datetime now = TimeCurrent();
    // Append (overwrite oldest if buffer full)
-   if(g_spread_n < SPREAD_RING_MAX)
+   if(g_spreadN < SPREAD_RING_MAX)
    {
-      g_spread_t[g_spread_n] = now;
-      g_spread_pts[g_spread_n] = pts;
-      g_spread_n++;
+      g_spreadT[g_spreadN] = now;
+      g_spreadPts[g_spreadN] = pts;
+      g_spreadN++;
    }
    else
    {
       // wrap
-      g_spread_t[g_spread_head] = now;
-      g_spread_pts[g_spread_head] = pts;
-      g_spread_head = (g_spread_head + 1) % SPREAD_RING_MAX;
+      g_spreadT[g_spreadHead] = now;
+      g_spreadPts[g_spreadHead] = pts;
+      g_spreadHead = (g_spreadHead + 1) % SPREAD_RING_MAX;
    }
 }
 
@@ -80,12 +80,12 @@ int Guards_SpreadMedian()
    datetime cutoff = now - (datetime)SpreadSpikeWindowSec;
    int vals[];
    int n = 0;
-   ArrayResize(vals, g_spread_n);
-   for(int i = 0; i < g_spread_n; i++)
+   ArrayResize(vals, g_spreadN);
+   for(int i = 0; i < g_spreadN; i++)
    {
-      if(g_spread_t[i] >= cutoff)
+      if(g_spreadT[i] >= cutoff)
       {
-         vals[n] = g_spread_pts[i];
+         vals[n] = g_spreadPts[i];
          n++;
       }
    }
@@ -107,11 +107,11 @@ bool Guards_SpreadSpikeBlocks()
 
 bool Guards_HourBlocked()
 {
-   if(!g_hour_block_parsed) Guards_ParseHourBlockList();
+   if(!g_hourBlockParsed) Guards_ParseHourBlockList();
    if(StringLen(HourBlockList) == 0) return false;
    MqlDateTime mdt;
    TimeToStruct(TimeCurrent(), mdt);
-   return g_hour_blocked[mdt.hour];
+   return g_hourBlocked[mdt.hour];
 }
 
 //+------------------------------------------------------------------+

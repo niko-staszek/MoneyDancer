@@ -188,13 +188,13 @@ bool SendOrder(int dir, double lots, bool useTP, int tpPoints, bool isRunner, st
    if(!isRunner) wantPyr = PyramidWantsOrder(dir);
 
    // MT4 original: pyramid starts with SL=TP=0; non-pyramid sets SL only
-   // if SL_Points>0 and TP only if caller requested it. Matches legacy
+   // if SLPoints>0 and TP only if caller requested it. Matches legacy
    // trade flow for A8 validation diffing.
    double sl = 0, tp = 0;
    if(!wantPyr)
    {
-      if(SL_Points > 0)
-         sl = (dir > 0 ? price - SL_Points * _Point : price + SL_Points * _Point);
+      if(SLPoints > 0)
+         sl = (dir > 0 ? price - SLPoints * _Point : price + SLPoints * _Point);
       if(useTP && tpPoints > 0)
          tp = (dir > 0 ? price + tpPoints * _Point : price - tpPoints * _Point);
    }
@@ -260,10 +260,10 @@ void HandleSignal(int signalDir)
    int cntNoRunners = CountSeriesOrdersDir(signalDir, seriesCmt, false);
 
    // Fast path (before martingale kicks in).
-   if(!ScenarioD || cntNoRunners < startBe)
+   if(!ScenarioD || cntNoRunners < StartBE)
    {
       if(!CheckMinDistanceFromExistingPositions(signalDir)) return;
-      SendOrder(signalDir, ComputeBaseLot(), true, TP_Points, false, seriesCmt);
+      SendOrder(signalDir, ComputeBaseLot(), true, TPPoints, false, seriesCmt);
       return;
    }
 
@@ -312,13 +312,13 @@ void HandleSignal(int signalDir)
       int    dStepNext = CountSeriesDAdds(basketDir, seriesCmt) + 1;
       double firstLot  = FirstBasketLotSeries(basketDir, seriesCmt);
 
-      // S2.C.5 — regime-aware multiplier. When lotMultiplierRange > 0 AND
+      // S2.C.5 — regime-aware multiplier. When LotMultiplierRange > 0 AND
       // UseMMDClassifier=true AND MMD says range (0), use the gentler Range
-      // multiplier. In trend (MMD=±1), keep the aggressive lotMultiplier value.
-      double effMult = lotMultiplier;
-      if(UseMMDClassifier && lotMultiplierRange > 0.0)
+      // multiplier. In trend (MMD=±1), keep the aggressive LotMultiplier value.
+      double effMult = LotMultiplier;
+      if(UseMMDClassifier && LotMultiplierRange > 0.0)
       {
-         if(MMD_RegimeSimple() == 0) effMult = lotMultiplierRange;
+         if(MMD_RegimeSimple() == 0) effMult = LotMultiplierRange;
       }
 
       double lotRaw    = firstLot * MathPow(effMult, dStepNext);

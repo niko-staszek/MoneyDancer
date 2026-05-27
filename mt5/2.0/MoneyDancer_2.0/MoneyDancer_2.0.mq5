@@ -235,17 +235,29 @@ void OnTick()
 
 //+------------------------------------------------------------------+
 //| Chart event handler                                               |
+//|                                                                   |
+//| CR-I6: Dashboard buttons (STOP/START, CloseAll, etc.) ARE         |
+//| implemented in Dashboard.mqh, but their dispatch uses a 1-sec     |
+//| polling loop in CheckButtonClicks() rather than CHARTEVENT_OBJECT_|
+//| CLICK dispatch. Keeping this handler empty is acceptable — the    |
+//| polling works. If sub-second button responsiveness becomes        |
+//| desired, wire CHARTEVENT_OBJECT_CLICK here to call DispatchButton.|
 //+------------------------------------------------------------------+
 void OnChartEvent(const int id,
                   const long &lparam,
                   const double &dparam,
                   const string &sparam)
 {
-   // Bare port: no dashboard buttons. Dashboard port is a later phase.
 }
 
 //+------------------------------------------------------------------+
-//| Custom tester criterion (placeholder — Phase D)                   |
+//| Custom tester criterion                                           |
+//|                                                                   |
+//| CR-M6: returns 0.0 to let MT5 use its built-in optimizer metric. |
+//| If we ever do parameter sweeps where custom scoring matters (e.g.,|
+//| weight UPI > raw profit), implement here. For now, optimizer-     |
+//| based work isn't on the roadmap (backtest iteration exhausted     |
+//| 2026-05-23 — see docs/HISTORY.md).                                |
 //+------------------------------------------------------------------+
 double OnTester()
 {

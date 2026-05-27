@@ -5,14 +5,14 @@
 //| ScenarioD is the martingale / grid layer. The entry-side logic   |
 //| (lot multiplier, step gate, min-distance) runs in Signal.mqh's   |
 //| HandleSignal (A5.6). This module only exposes the TP-application |
-//| helpers that re-level the basket's common TP to BE + bePoints    |
+//| helpers that re-level the basket's common TP to BE + BEPoints    |
 //| whenever a new add lands.                                         |
 //+------------------------------------------------------------------+
 #ifndef __MD_SCENARIOD_MQH__
 #define __MD_SCENARIOD_MQH__
 
 //+------------------------------------------------------------------+
-//| Apply a common TP (BE + bePoints) across all series positions.   |
+//| Apply a common TP (BE + BEPoints) across all series positions.   |
 //| Skips pyramid tickets and runners.                                |
 //+------------------------------------------------------------------+
 void ApplyBasketTPSeries(int dir, string seriesKey)
@@ -20,7 +20,7 @@ void ApplyBasketTPSeries(int dir, string seriesKey)
    double be;
    if(!CalcBasketBEWithCostsSeries(dir, seriesKey, be)) return;
 
-   double tp = (dir > 0 ? be + bePoints * _Point : be - bePoints * _Point);
+   double tp = (dir > 0 ? be + BEPoints * _Point : be - BEPoints * _Point);
    tp = NormalizePrice(tp);
 
    int total = PositionsTotal();

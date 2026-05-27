@@ -27,8 +27,8 @@
 #ifndef __MD_TELEMETRY_MQH__
 #define __MD_TELEMETRY_MQH__
 
-int      g_tele_file        = INVALID_HANDLE;
-int      g_tele_dayKey      = -1;
+int      g_teleFile        = INVALID_HANDLE;
+int      g_teleDayKey      = -1;
 
 string TelemetryFileName(datetime t)
 {
@@ -40,8 +40,8 @@ string TelemetryFileName(datetime t)
 
 void TelemetryWriteHeader()
 {
-   if(g_tele_file == INVALID_HANDLE) return;
-   FileWrite(g_tele_file,
+   if(g_teleFile == INVALID_HANDLE) return;
+   FileWrite(g_teleFile,
       "ts", "event_type", "event_data",
       "balance", "equity", "day_pl", "day_pl_pct",
       "peak_eq", "current_dd_pct",
@@ -63,8 +63,8 @@ bool TelemetryOpenToday()
 
    bool isNew = (FileSize(h) == 0);
    FileSeek(h, 0, SEEK_END);
-   g_tele_file   = h;
-   g_tele_dayKey = DayKey(TimeCurrent());
+   g_teleFile   = h;
+   g_teleDayKey = DayKey(TimeCurrent());
 
    if(isNew) TelemetryWriteHeader();
    return true;
@@ -72,10 +72,10 @@ bool TelemetryOpenToday()
 
 void TelemetryClose()
 {
-   if(g_tele_file != INVALID_HANDLE)
+   if(g_teleFile != INVALID_HANDLE)
    {
-      FileClose(g_tele_file);
-      g_tele_file = INVALID_HANDLE;
+      FileClose(g_teleFile);
+      g_teleFile = INVALID_HANDLE;
    }
 }
 
@@ -83,7 +83,7 @@ void TelemetryRotateIfNeeded()
 {
    if(MQLInfoInteger(MQL_TESTER)) return;
    int dk = DayKey(TimeCurrent());
-   if(dk != g_tele_dayKey)
+   if(dk != g_teleDayKey)
    {
       TelemetryClose();
       TelemetryOpenToday();
@@ -109,7 +109,7 @@ void TelemetryLogEvent(string event_type, string event_data = "", string comment
 {
    if(MQLInfoInteger(MQL_TESTER)) return;
    TelemetryRotateIfNeeded();
-   if(g_tele_file == INVALID_HANDLE)
+   if(g_teleFile == INVALID_HANDLE)
    {
       if(!TelemetryOpenToday()) return;
    }
@@ -123,7 +123,7 @@ void TelemetryLogEvent(string event_type, string event_data = "", string comment
    int    sellPos   = CountMinePositions(-1);
    bool   paused    = IsAutoPaused();
 
-   FileWrite(g_tele_file,
+   FileWrite(g_teleFile,
       TimeToString(TimeCurrent(), TIME_DATE | TIME_SECONDS),
       event_type,
       event_data,
@@ -140,7 +140,7 @@ void TelemetryLogEvent(string event_type, string event_data = "", string comment
       IntegerToString(g_basketSLToday),
       comment);
 
-   FileFlush(g_tele_file);  // crash-safety: flush on every event
+   FileFlush(g_teleFile);  // crash-safety: flush on every event
 }
 
 void TelemetryInit()

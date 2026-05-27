@@ -16,58 +16,58 @@ input bool   UseTradingHours         = true;  // Use Trading Hours
 
 // Monday
 input bool   MondayTrading           = true;  // Monday Trading
-input int    MonStart1_Hour          = 0;     // Start Set 1: HH
-input int    MonStart1_Minute        = 0;     // Start Set 1: MM
-input int    MonEnd1_Hour            = 0;     // End Set 1: HH
-input int    MonEnd1_Minute          = 0;     // End Set 1: MM
-input int    MonStart2_Hour          = 0;     // Start Set 2: HH
-input int    MonStart2_Minute        = 0;     // Start Set 2: MM
-input int    MonEnd2_Hour            = 0;     // End Set 2: HH
-input int    MonEnd2_Minute          = 0;     // End Set 2: MM
+input int    MonStart1Hour          = 0;     // Start Set 1: HH
+input int    MonStart1Minute        = 0;     // Start Set 1: MM
+input int    MonEnd1Hour            = 0;     // End Set 1: HH
+input int    MonEnd1Minute          = 0;     // End Set 1: MM
+input int    MonStart2Hour          = 0;     // Start Set 2: HH
+input int    MonStart2Minute        = 0;     // Start Set 2: MM
+input int    MonEnd2Hour            = 0;     // End Set 2: HH
+input int    MonEnd2Minute          = 0;     // End Set 2: MM
 
 // Tuesday
 input bool   TuesdayTrading          = true;  // Tuesday Trading
-input int    TueStart1_Hour          = 0;
-input int    TueStart1_Minute        = 0;
-input int    TueEnd1_Hour            = 0;
-input int    TueEnd1_Minute          = 0;
-input int    TueStart2_Hour          = 0;
-input int    TueStart2_Minute        = 0;
-input int    TueEnd2_Hour            = 0;
-input int    TueEnd2_Minute          = 0;
+input int    TueStart1Hour          = 0;
+input int    TueStart1Minute        = 0;
+input int    TueEnd1Hour            = 0;
+input int    TueEnd1Minute          = 0;
+input int    TueStart2Hour          = 0;
+input int    TueStart2Minute        = 0;
+input int    TueEnd2Hour            = 0;
+input int    TueEnd2Minute          = 0;
 
 // Wednesday
 input bool   WednesdayTrading        = true;  // Wednesday Trading
-input int    WedStart1_Hour          = 0;
-input int    WedStart1_Minute        = 0;
-input int    WedEnd1_Hour            = 0;
-input int    WedEnd1_Minute          = 0;
-input int    WedStart2_Hour          = 0;
-input int    WedStart2_Minute        = 0;
-input int    WedEnd2_Hour            = 0;
-input int    WedEnd2_Minute          = 0;
+input int    WedStart1Hour          = 0;
+input int    WedStart1Minute        = 0;
+input int    WedEnd1Hour            = 0;
+input int    WedEnd1Minute          = 0;
+input int    WedStart2Hour          = 0;
+input int    WedStart2Minute        = 0;
+input int    WedEnd2Hour            = 0;
+input int    WedEnd2Minute          = 0;
 
 // Thursday
 input bool   ThursdayTrading         = true;  // Thursday Trading
-input int    ThuStart1_Hour          = 0;
-input int    ThuStart1_Minute        = 0;
-input int    ThuEnd1_Hour            = 0;
-input int    ThuEnd1_Minute          = 0;
-input int    ThuStart2_Hour          = 0;
-input int    ThuStart2_Minute        = 0;
-input int    ThuEnd2_Hour            = 0;
-input int    ThuEnd2_Minute          = 0;
+input int    ThuStart1Hour          = 0;
+input int    ThuStart1Minute        = 0;
+input int    ThuEnd1Hour            = 0;
+input int    ThuEnd1Minute          = 0;
+input int    ThuStart2Hour          = 0;
+input int    ThuStart2Minute        = 0;
+input int    ThuEnd2Hour            = 0;
+input int    ThuEnd2Minute          = 0;
 
 // Friday
 input bool   FridayTrading           = true;  // Friday Trading
-input int    FriStart1_Hour          = 0;
-input int    FriStart1_Minute        = 0;
-input int    FriEnd1_Hour            = 0;
-input int    FriEnd1_Minute          = 0;
-input int    FriStart2_Hour          = 0;
-input int    FriStart2_Minute        = 0;
-input int    FriEnd2_Hour            = 0;
-input int    FriEnd2_Minute          = 0;
+input int    FriStart1Hour          = 0;
+input int    FriStart1Minute        = 0;
+input int    FriEnd1Hour            = 0;
+input int    FriEnd1Minute          = 0;
+input int    FriStart2Hour          = 0;
+input int    FriStart2Minute        = 0;
+input int    FriEnd2Hour            = 0;
+input int    FriEnd2Minute          = 0;
 
 //==================== SIGNAL (Tick Burst) ====================
 input string __sec_ai_order_detection__ = "==== Order Detection ====";
@@ -116,10 +116,10 @@ input int    TickWindowTicks       = 25;     // Check next X Trades for TOE
 //==================== MA SLOPE FILTER ====================
 input string __sec_trend_filter__ = "==== Filter for Trend Detection ====";
 input bool   UseSlopeFilter        = true;   // Dynamic - Strength of Momentum
-input int    maPeriod              = 50;     // Dynamic Period
-input int    slopeLookbackBars     = 5;      // Min. sequences for Strength
-input int    slopeThresholdPts     = 20;     // Dynamic force threshold for direction confirmation
-input int    strongTrendPts        = 60;     // Threshold for detecting strong dynamics
+input int    MAPeriod              = 50;     // Dynamic Period
+input int    SlopeLookbackBars     = 5;      // Min. sequences for Strength
+input int    SlopeThresholdPts     = 20;     // Dynamic force threshold for direction confirmation
+input int    StrongTrendPts        = 60;     // Threshold for detecting strong dynamics
 
 //==================== TRADING ====================
 input string __sec_orders_sl_tp__ = "==== Orders & SL & TP ====";
@@ -130,24 +130,24 @@ input double LotsBase              = 0.01;  // Basic Order Size (used when LotsB
 // new entries. Lets the same .set scale across 5k → 100k → 200k accounts
 // without manual edits. Default 0 = use the fixed LotsBase above.
 input double LotsBasePerThousand   = 0.0;   // S1.5 Lots per $1000 of equity (0=OFF; recommend 0.002 for 0.01@5k / 0.20@100k)
-input int    TP_Points             = 50;    // Take Profit for Basic Order
-input int    SL_Points             = 0;     // Stop Loss for Basic Order (MT4 original)
+input int    TPPoints             = 50;    // Take Profit for Basic Order
+input int    SLPoints             = 0;     // Stop Loss for Basic Order (MT4 original)
 input int    Slippage              = 10;    // Accepted slippage for price
 input int    Magic                 = 21010; // Magic Number
 
 //==================== SCENARIO D ====================
 input string __sec_higher_risk__ = "==== Higher Risk Mode for Orders ====";
 input bool   ScenarioD             = true;  // MoE for Exit
-input int    startBe               = 5;     // After X Trades find Exit
-input double lotMultiplier         = 1.50;  // Multiply Basic Order *X (used in MMD-trend if Range set)
+input int    StartBE               = 5;     // After X Trades find Exit
+input double LotMultiplier         = 1.50;  // Multiply Basic Order *X (used in MMD-trend if Range set)
 // S2.C.5 — regime-aware martingale multiplier. When > 0 AND UseMMDClassifier=true,
 // uses this value when MMD_RegimeSimple()==0 (range regime). In trend (MMD=±1),
-// keeps using lotMultiplier. When 0 (default), falls back to lotMultiplier for all
+// keeps using LotMultiplier. When 0 (default), falls back to LotMultiplier for all
 // regimes — legacy behavior. Discovery from S2.C.2: weak/range cells benefit from
 // gentler 2.5x, monsters need aggressive 4.0x. Regime-aware splits these answers.
-input double lotMultiplierRange    = 0.0;   // S2.C.5 martingale mult in MMD-range (0=use lotMultiplier)
-input int    bePoints              = 30;    // Breakeven for ALL (sell or buy) Orders
-input double maxLot                = 0.0;   // Max Lot Size
+input double LotMultiplierRange    = 0.0;   // S2.C.5 martingale mult in MMD-range (0=use LotMultiplier)
+input int    BEPoints              = 30;    // Breakeven for ALL (sell or buy) Orders
+input double MaxLot                = 0.0;   // Max Lot Size
 input int    MaxOrdersDir          = 50;    // Max Orders in one Direction
 input int    StepPoints            = 120;   // After X points let MOE run
 input int    MinOrderDistancePts   = 100;   // Min distance between orders (points)
@@ -155,7 +155,7 @@ input int    MinOrderDistancePts   = 100;   // Min distance between orders (poin
 input string __sec_gather_profits__ = "==== Gather Profits ====";
 //==================== PYRAMIDING ====================
 // Minimal state: ticket, trigger, tp, sl, index. Pyramid is always single-direction.
-// TP distance is always TP_Points (same as basic orders).
+// TP distance is always TPPoints (same as basic orders).
 input int    PyramRange              = 0;     // Pyramiding Range (0=OFF, >0=ON)
 input int    PyramSlopeEmaPeriod     = 3;     // Dynamic Period
 input int    PyramSlopeLookbackBars  = 5;     // Min. sequences for Strength
@@ -170,8 +170,8 @@ input int    PyramidFixedTPPts       = 0;     // S3.2c TP for pyramid pos (0=leg
 
 //==================== GUARDS ====================
 input string __sec_loss_control__ = "==== Set Loss Control ====";
-input double MaxBasketDD_Pct       = 55.0; // Max DD per basket -> hedge. Test it!
-input double MaxEquityDD_Pct       = 80.0; // Max DD across all trades -> hedge. Test it!
+input double MaxBasketDDPct       = 55.0; // Max DD per basket -> hedge. Test it!
+input double MaxEquityDDPct       = 80.0; // Max DD across all trades -> hedge. Test it!
 
 // S1.0 — per-basket equity stop-loss rail (default OFF for 1:1 1.1 parity).
 // When a series' floating loss reaches MaxBasketLossPct of the equity at series open,
@@ -197,7 +197,7 @@ input double MaxBasketLossPctTrendAgainst = 0.0;  // 0 = use MaxBasketLossPct
 input bool   BlockDOnAdverseMMD           = false;
 
 // S2.A.7 Option 3 — gate ScenarioE hedge runner activation by MMD.
-// ScenarioE existing logic activates on MaxBasketDD_Pct threshold. When
+// ScenarioE existing logic activates on MaxBasketDDPct threshold. When
 // UseMMDAdverseGateForE=true and UseMMDClassifier=true, ScenarioE additionally
 // requires MMD to oppose the basket direction (i.e., hedge only when trend
 // really is against us, not on random basket DDs in range regimes).
@@ -293,13 +293,13 @@ input ENUM_REGIME_TREND_MODE RegimeTrendMode = REGIME_TREND_BLOCK_BOTH;  // S3.2
 // (7-cloud stacking; classifies BULL/RANGE/BEAR via {+1,+0.5,0,-0.5,-1} stack)
 // instead of the simple ADX threshold. MMD is per-bar cached.
 input bool             UseMMDClassifier   = false;   // S3.2a Use MMD instead of ADX
-input int              MMDPeriod_Red      = 12;      // fast cloud
-input int              MMDPeriod_Orange   = 48;
-input int              MMDPeriod_LBlue    = 144;
-input int              MMDPeriod_Blue     = 288;
-input int              MMDPeriod_LGreen   = 720;
-input int              MMDPeriod_Green    = 1440;
-input int              MMDPeriod_Purple   = 3456;   // slow cloud
+input int              MMDPeriodRed      = 12;      // fast cloud
+input int              MMDPeriodOrange   = 48;
+input int              MMDPeriodLBlue    = 144;
+input int              MMDPeriodBlue     = 288;
+input int              MMDPeriodLGreen   = 720;
+input int              MMDPeriodGreen    = 1440;
+input int              MMDPeriodPurple   = 3456;   // slow cloud
 
 //==================== DAILY RISK LOCKS ====================
 input string __sec_daily_risk__                 = "══════ DAILY RISK LOCKS ══════";
@@ -349,7 +349,7 @@ input double ProfitTargetUsd = 100.0;  // Target as USD amount   (Mode=FixedUSD)
 input string __sec_big_losses__ = "==== Helper for BIG LOSSES ====";
 input bool   ScenarioE             = false; // Test it! Active hedge!
 input double HedgeRatio            = 0.35;
-input int    RunnerBE_StartPts     = 120;
+input int    RunnerBEStartPts     = 120;
 input int    RunnerTrailDistPts    = 200;
 input int    RunnerTrailStepPts    = 50;
 input double SiphonPct             = 0.90;

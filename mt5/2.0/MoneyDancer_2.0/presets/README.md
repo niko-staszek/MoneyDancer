@@ -29,21 +29,21 @@ The current production-ready config. Use this for cent forward test and live dep
 | `MinMovePoints` | 25 | Tested 30/35/40 (round 2/3) — adaptive variants broke marginal cells. Stay at 25 (user-tuned baseline). |
 | `MaxSpreadPts` | 100 | Calibrated for Duka spread overlay (median ~70-100). On live RoboForex Pro (median ~25), can tighten to 50 — but validated backtest used 100, ship config matches. |
 | `LotsBasePerThousand` | 0.002 | S1.5 auto-scaled lot. (equity/$1000) × 0.002 → 0.01 lot at $5k, 0.20 lot at $100k, 0.40 lot at $200k. Linear scaling verified on 100k Apr1-10 test. |
-| `lotMultiplier` | 4.0 | User's value. Tested 2.5/3.0 (round 2/3) — broke monster captures. 4.0 is correctly aggressive. |
-| `lotMultiplierRange` | 0.0 (OFF) | S2.C.5 feature. Stack-on-STEP test (2026-05-21) showed 2.5-in-range hurt monsters 3× more than it helped weak cells. Leave OFF. |
-| `bePoints` | 65 | User's value. Tested 40/100 (S2.C.3 TIGHT/WIDE) — TIGHT broke monsters, WIDE broke mar25. 65 is correct middle. |
-| `startBe` | 1 | User's value. Aggressive martingale-from-trade-2 needed for monster captures. |
-| `maxLot` | 0.0 (no cap) | UNSAFE at high equity. Suggested live setting: `maxLot=5.0` once equity > $200k real (or cent equivalent). |
+| `LotMultiplier` | 4.0 | User's value. Tested 2.5/3.0 (round 2/3) — broke monster captures. 4.0 is correctly aggressive. (Renamed from `lotMultiplier` in 2026-05-24 naming refactor.) |
+| `LotMultiplierRange` | 0.0 (OFF) | S2.C.5 feature. Stack-on-STEP test (2026-05-21) showed 2.5-in-range hurt monsters 3× more than it helped weak cells. Leave OFF. |
+| `BEPoints` | 65 | User's value. Tested 40/100 (S2.C.3 TIGHT/WIDE) — TIGHT broke monsters, WIDE broke mar25. 65 is correct middle. (Renamed from `bePoints`.) |
+| `StartBE` | 1 | User's value. Aggressive martingale-from-trade-2 needed for monster captures. (Renamed from `startBe`.) |
+| `MaxLot` | 0.0 (no cap) | UNSAFE at high equity. Suggested live setting: `MaxLot=5.0` once equity > $200k real (or cent equivalent). (Renamed from `maxLot`.) |
 | `MaxOrdersDir` | 50 | Default. Allows deep baskets. Tested 30 (round 2) — broke things. |
 | **`StepPoints`** | **80** | **NEW IN STEP** (was 120). Drives basket-BE gate to trigger earlier → martingale starts sooner → faster basket build-up → captures TP retraces in trend cells. +51% aggregate gain. Single biggest improvement in 5 rounds. |
 | **`MinOrderDistancePts`** | **60** | **NEW IN STEP** (was 40). Prevents over-densification at any one price level. Mostly neutral effect alone, but pairs with StepPoints=80. |
 | `PyramRange` | 0 (OFF) | Round 1 tested ON variants — all failed (sustained-trend runaway). |
 | `PyramidFixedTPPts` | 0 (OFF) | S3.2c feature. Available but not in ship. |
-| `MaxBasketDD_Pct` | 55.0 | User's value. Soft sanity guard (basket-SL at 8% is tighter binding constraint). |
+| `MaxBasketDDPct` | 55.0 | User's value. Soft sanity guard (basket-SL at 8% is tighter binding constraint). (Renamed from `MaxBasketDD_Pct`.) |
 | `MaxBasketLossPct` | 8.0 | S1.0 ship rail. Tested 5% (round 1) and regime-aware variants (round 4) — all worse. |
 | `MaxBasketSLPerDay` | 2 | Day-pause after 2 basket-SLs. Safety mechanism for catastrophic days. |
 | `MaxAllTimeDDPct` | 40.0 | S1.6 trailing kill. Conservative — backtest max DD never reached 40%. |
-| `FridayFlattenHour` | 20 | S1.7 Friday flatten. Coordinates with FriEnd1_Hour=19. |
+| `FridayFlattenHour` | 20 | S1.7 Friday flatten. Coordinates with FriEnd1Hour=19. |
 | `UseNewsBlackout` | false | Tested ON (S17 → FULL) — over-restrictive, killed Apr-2025 monster. Per-event analysis (2026-05-20) confirmed WT regime gate filters news implicitly. |
 | `UseSpreadSpikeGuard` | false | Over-restrictive on Duka feeds. Revisit with live RB data if needed. |
 | `MaxDailyLossPct` | 0.0 (OFF) | Optional. Set to 15 for additional safety. |
@@ -51,7 +51,7 @@ The current production-ready config. Use this for cent forward test and live dep
 | `RegimeMode` | 2 (HARD) | S3.2 regime gate enabled. |
 | `UseMMDClassifier` | true | S3.2a MMD multi-cloud. Better than ADX. |
 | `RegimeTrendMode` | 1 (WITH_TREND) | S3.2b. Allow grid only in MMD's trend direction. Saves Sep 2025 from -20% to +66%. |
-| MMD periods | 12/48/144/288/720/1440/3456 | CashCabaret defaults. Untested but leave alone. |
+| MMD periods (`MMDPeriodRed`/`MMDPeriodOrange`/...) | 12/48/144/288/720/1440/3456 | CashCabaret defaults. Untested but leave alone. (Renamed from `MMDPeriod_Red`/etc.) |
 | `ScenarioE` | false | Hedge runners. Round 4 tested with MMD gate — never fired in practice. |
 | All other unused features | OFF/0 | See Inputs.mqh for descriptions. |
 

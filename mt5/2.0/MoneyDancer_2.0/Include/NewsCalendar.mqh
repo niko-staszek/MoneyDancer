@@ -19,10 +19,10 @@
 
 struct NewsEvent { datetime t; int tier; string cur; string label; };
 
-NewsEvent g_news_events[];          // dynamic; sized at News_Init
-int       g_news_count  = 0;
-int       g_news_cursor = 0;       // index of next-pending event
-string    g_news_source = "none"; // "mt5" or "fallback"
+NewsEvent g_newsEvents[];          // dynamic; sized at News_Init
+int       g_newsCount  = 0;
+int       g_newsCursor = 0;       // index of next-pending event
+string    g_newsSource = "none"; // "mt5" or "fallback"
 
 // ----- helpers -----
 
@@ -36,27 +36,27 @@ int News_ImportanceToTier(int imp)
 
 void News_AppendEvent(datetime t, int tier, string cur, string label)
 {
-   int n = ArraySize(g_news_events);
-   ArrayResize(g_news_events, n + 1);
-   g_news_events[n].t = t;
-   g_news_events[n].tier = tier;
-   g_news_events[n].cur = cur;
-   g_news_events[n].label = label;
+   int n = ArraySize(g_newsEvents);
+   ArrayResize(g_newsEvents, n + 1);
+   g_newsEvents[n].t = t;
+   g_newsEvents[n].tier = tier;
+   g_newsEvents[n].cur = cur;
+   g_newsEvents[n].label = label;
 }
 
 void News_SortByTime()
 {
-   int n = ArraySize(g_news_events);
+   int n = ArraySize(g_newsEvents);
    for(int i = 1; i < n; i++)
    {
-      NewsEvent key = g_news_events[i];
+      NewsEvent key = g_newsEvents[i];
       int j = i - 1;
-      while(j >= 0 && g_news_events[j].t > key.t)
+      while(j >= 0 && g_newsEvents[j].t > key.t)
       {
-         g_news_events[j + 1] = g_news_events[j];
+         g_newsEvents[j + 1] = g_newsEvents[j];
          j--;
       }
-      g_news_events[j + 1] = key;
+      g_newsEvents[j + 1] = key;
    }
 }
 
@@ -236,24 +236,24 @@ void News_LoadFallback()
 
 void News_Init()
 {
-   ArrayResize(g_news_events, 0);
-   g_news_count  = 0;
-   g_news_cursor = 0;
+   ArrayResize(g_newsEvents, 0);
+   g_newsCount  = 0;
+   g_newsCursor = 0;
 
    int n_mt5 = News_TryLoadFromMT5();
    if(n_mt5 > 0)
    {
-      g_news_source = "mt5";
-      g_news_count  = n_mt5;
+      g_newsSource = "mt5";
+      g_newsCount  = n_mt5;
    }
    else
    {
       News_LoadFallback();
-      g_news_source = "fallback";
-      g_news_count  = ArraySize(g_news_events);
+      g_newsSource = "fallback";
+      g_newsCount  = ArraySize(g_newsEvents);
    }
    News_SortByTime();
-   PrintFormat("[S1.1] NewsCalendar loaded %d events (source=%s)", g_news_count, g_news_source);
+   PrintFormat("[S1.1] NewsCalendar loaded %d events (source=%s)", g_newsCount, g_newsSource);
 }
 
 //+------------------------------------------------------------------+
@@ -279,8 +279,8 @@ bool News_RelevantCurrency(string cur)
 void News_AdvanceCursor()
 {
    datetime cutoff = TimeCurrent() - (datetime)(NewsBlackoutPostMin * 60);
-   while(g_news_cursor < g_news_count && g_news_events[g_news_cursor].t < cutoff)
-      g_news_cursor++;
+   while(g_newsCursor < g_newsCount && g_newsEvents[g_newsCursor].t < cutoff)
+      g_newsCursor++;
 }
 
 //+------------------------------------------------------------------+
@@ -293,14 +293,14 @@ bool News_IsBlackoutActive()
    if(!UseNewsBlackout) return false;
    News_AdvanceCursor();
    datetime now = TimeCurrent();
-   for(int i = g_news_cursor; i < g_news_count; i++)
+   for(int i = g_newsCursor; i < g_newsCount; i++)
    {
-      datetime t = g_news_events[i].t;
+      datetime t = g_newsEvents[i].t;
       if(t > now + (datetime)(NewsBlackoutPreMin * 60)) break;
-      int tier = g_news_events[i].tier;
+      int tier = g_newsEvents[i].tier;
       bool tierOK = (tier == 1) || (tier == 2 && NewsBlackoutTier2);
       if(!tierOK) continue;
-      if(!News_RelevantCurrency(g_news_events[i].cur)) continue;
+      if(!News_RelevantCurrency(g_newsEvents[i].cur)) continue;
       if(t > now) return true;                                  // upcoming, within pre-window
       if(now - t <= (datetime)(NewsBlackoutPostMin * 60)) return true;  // recently fired
    }

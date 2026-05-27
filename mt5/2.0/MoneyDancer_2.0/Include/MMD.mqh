@@ -26,18 +26,18 @@
 double MMD_SMA(int period_idx, int bar)
 {
    if(period_idx < 0 || period_idx > 6) return 0;
-   if(g_mmd_hSMA[period_idx] == INVALID_HANDLE) return 0;
+   if(g_mmdHandlesSMA[period_idx] == INVALID_HANDLE) return 0;
    double v[];
-   if(CopyBuffer(g_mmd_hSMA[period_idx], 0, bar, 1, v) != 1) return 0;
+   if(CopyBuffer(g_mmdHandlesSMA[period_idx], 0, bar, 1, v) != 1) return 0;
    return v[0];
 }
 
 double MMD_EMA(int period_idx, int bar)
 {
    if(period_idx < 0 || period_idx > 6) return 0;
-   if(g_mmd_hEMA[period_idx] == INVALID_HANDLE) return 0;
+   if(g_mmdHandlesEMA[period_idx] == INVALID_HANDLE) return 0;
    double v[];
-   if(CopyBuffer(g_mmd_hEMA[period_idx], 0, bar, 1, v) != 1) return 0;
+   if(CopyBuffer(g_mmdHandlesEMA[period_idx], 0, bar, 1, v) != 1) return 0;
    return v[0];
 }
 
@@ -51,28 +51,28 @@ double MMD_CloudMid(int period_idx, int bar)
 
 bool MMD_Init()
 {
-   g_mmd_periods[MMD_IDX_RED]    = MMDPeriod_Red;
-   g_mmd_periods[MMD_IDX_ORANGE] = MMDPeriod_Orange;
-   g_mmd_periods[MMD_IDX_LBLUE]  = MMDPeriod_LBlue;
-   g_mmd_periods[MMD_IDX_BLUE]   = MMDPeriod_Blue;
-   g_mmd_periods[MMD_IDX_LGREEN] = MMDPeriod_LGreen;
-   g_mmd_periods[MMD_IDX_GREEN]  = MMDPeriod_Green;
-   g_mmd_periods[MMD_IDX_PURPLE] = MMDPeriod_Purple;
+   g_mmdPeriods[MMD_IDX_RED]    = MMDPeriodRed;
+   g_mmdPeriods[MMD_IDX_ORANGE] = MMDPeriodOrange;
+   g_mmdPeriods[MMD_IDX_LBLUE]  = MMDPeriodLBlue;
+   g_mmdPeriods[MMD_IDX_BLUE]   = MMDPeriodBlue;
+   g_mmdPeriods[MMD_IDX_LGREEN] = MMDPeriodLGreen;
+   g_mmdPeriods[MMD_IDX_GREEN]  = MMDPeriodGreen;
+   g_mmdPeriods[MMD_IDX_PURPLE] = MMDPeriodPurple;
 
    // Match Regime.mqh's deferred-init pattern: don't fail OnInit if handles
    // can't be created yet (custom symbols in tester may not have bars ready).
    // We retry lazily in MMD_OnNewBarIfAny / MMD_RegimeSimple.
    for(int i = 0; i < 7; i++)
    {
-      g_mmd_hSMA[i] = INVALID_HANDLE;
-      g_mmd_hEMA[i] = INVALID_HANDLE;
+      g_mmdHandlesSMA[i] = INVALID_HANDLE;
+      g_mmdHandlesEMA[i] = INVALID_HANDLE;
    }
    for(int i = 0; i < 3; i++)
    {
-      g_mmd_lastCrossBarTime[i] = 0;
-      g_mmd_lastCrossSign[i]    = 0;
+      g_mmdLastCrossBarTime[i] = 0;
+      g_mmdLastCrossSign[i]    = 0;
    }
-   g_mmd_lastBarProcessed = 0;
+   g_mmdLastBarProcessed = 0;
    return true;
 }
 
@@ -80,8 +80,8 @@ void MMD_Deinit()
 {
    for(int i = 0; i < 7; i++)
    {
-      if(g_mmd_hSMA[i] != INVALID_HANDLE) { IndicatorRelease(g_mmd_hSMA[i]); g_mmd_hSMA[i] = INVALID_HANDLE; }
-      if(g_mmd_hEMA[i] != INVALID_HANDLE) { IndicatorRelease(g_mmd_hEMA[i]); g_mmd_hEMA[i] = INVALID_HANDLE; }
+      if(g_mmdHandlesSMA[i] != INVALID_HANDLE) { IndicatorRelease(g_mmdHandlesSMA[i]); g_mmdHandlesSMA[i] = INVALID_HANDLE; }
+      if(g_mmdHandlesEMA[i] != INVALID_HANDLE) { IndicatorRelease(g_mmdHandlesEMA[i]); g_mmdHandlesEMA[i] = INVALID_HANDLE; }
    }
 }
 
@@ -90,11 +90,11 @@ bool MMD_EnsureHandles()
    bool all_ok = true;
    for(int i = 0; i < 7; i++)
    {
-      if(g_mmd_hSMA[i] == INVALID_HANDLE)
-         g_mmd_hSMA[i] = iMA(_Symbol, _Period, g_mmd_periods[i], 0, MODE_SMA, PRICE_CLOSE);
-      if(g_mmd_hEMA[i] == INVALID_HANDLE)
-         g_mmd_hEMA[i] = iMA(_Symbol, _Period, g_mmd_periods[i], 0, MODE_EMA, PRICE_CLOSE);
-      if(g_mmd_hSMA[i] == INVALID_HANDLE || g_mmd_hEMA[i] == INVALID_HANDLE) all_ok = false;
+      if(g_mmdHandlesSMA[i] == INVALID_HANDLE)
+         g_mmdHandlesSMA[i] = iMA(_Symbol, _Period, g_mmdPeriods[i], 0, MODE_SMA, PRICE_CLOSE);
+      if(g_mmdHandlesEMA[i] == INVALID_HANDLE)
+         g_mmdHandlesEMA[i] = iMA(_Symbol, _Period, g_mmdPeriods[i], 0, MODE_EMA, PRICE_CLOSE);
+      if(g_mmdHandlesSMA[i] == INVALID_HANDLE || g_mmdHandlesEMA[i] == INVALID_HANDLE) all_ok = false;
    }
    return all_ok;
 }
@@ -106,14 +106,14 @@ void MMD_EvalCross(int pair_idx, int pFast, int pSlow, datetime barTime)
    if(fastMid == 0 || slowMid == 0) return;
    int sign = (fastMid > slowMid) ? +1 : (fastMid < slowMid ? -1 : 0);
    if(sign == 0) return;
-   if(g_mmd_lastCrossSign[pair_idx] == 0)
+   if(g_mmdLastCrossSign[pair_idx] == 0)
    {
-      g_mmd_lastCrossSign[pair_idx] = sign;
+      g_mmdLastCrossSign[pair_idx] = sign;
    }
-   else if(sign != g_mmd_lastCrossSign[pair_idx])
+   else if(sign != g_mmdLastCrossSign[pair_idx])
    {
-      g_mmd_lastCrossSign[pair_idx]    = sign;
-      g_mmd_lastCrossBarTime[pair_idx] = barTime;
+      g_mmdLastCrossSign[pair_idx]    = sign;
+      g_mmdLastCrossBarTime[pair_idx] = barTime;
    }
 }
 
@@ -122,8 +122,8 @@ void MMD_OnNewBarIfAny()
    if(!UseMMDClassifier) return;
 
    datetime t1 = iTime(_Symbol, _Period, 1);
-   if(t1 == 0 || t1 == g_mmd_lastBarProcessed) return;
-   g_mmd_lastBarProcessed = t1;
+   if(t1 == 0 || t1 == g_mmdLastBarProcessed) return;
+   g_mmdLastBarProcessed = t1;
 
    MMD_EnsureHandles();
    MMD_EvalCross(0, MMD_IDX_RED,    MMD_IDX_ORANGE, t1);

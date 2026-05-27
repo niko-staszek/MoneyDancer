@@ -21,8 +21,8 @@ datetime g_posLastSync = 0;
 
 //==================== SLOPE CACHE (A5.1) ====================
 // MA handles created in SlopeInit() / released in SlopeDeinit().
-int      g_ma_handle_main  = INVALID_HANDLE;  // main slope filter EMA (maPeriod)
-int      g_ma_handle_pyram = INVALID_HANDLE;  // pyramid slope EMA (PyramSlopeEmaPeriod)
+int      g_maHandleMain  = INVALID_HANDLE;  // main slope filter EMA (MAPeriod)
+int      g_maHandlePyram = INVALID_HANDLE;  // pyramid slope EMA (PyramSlopeEmaPeriod)
 datetime g_lastBarTime     = 0;
 int      g_cachedSlopeDir  = 0;   // +1 up, 0 flat, -1 down
 int      g_cachedSlopePts  = 0;
@@ -61,12 +61,12 @@ int g_basketSLToday  = 0;
 int g_basketSLDayKey = -1;
 
 // S3.2a — MMD multi-cloud regime classifier state (lifted from CashCabaret).
-int      g_mmd_hSMA[7];                              // indicator handles per period
-int      g_mmd_hEMA[7];
-int      g_mmd_periods[7];                           // resolved from inputs at init
-datetime g_mmd_lastCrossBarTime[3];
-int      g_mmd_lastCrossSign[3];
-datetime g_mmd_lastBarProcessed  = 0;
+int      g_mmdHandlesSMA[7];                              // indicator handles per period
+int      g_mmdHandlesEMA[7];
+int      g_mmdPeriods[7];                           // resolved from inputs at init
+datetime g_mmdLastCrossBarTime[3];
+int      g_mmdLastCrossSign[3];
+datetime g_mmdLastBarProcessed  = 0;
 
 //==================== DAILY RISK STATE (A5.4) ====================
 int      g_baseDayKey       = -1;

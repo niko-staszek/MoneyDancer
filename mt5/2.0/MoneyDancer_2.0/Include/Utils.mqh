@@ -28,7 +28,7 @@ double ClampLot(double lot)
 
    if(lot < minLot) lot = minLot;
    if(lot > maxLotSym) lot = maxLotSym;
-   if(maxLot > 0.0 && lot > maxLot) lot = maxLot;
+   if(MaxLot > 0.0 && lot > MaxLot) lot = MaxLot;
 
    if(step > 0.0) lot = MathFloor(lot / step) * step;
    lot = NormalizeDouble(lot, 2);
@@ -280,11 +280,11 @@ bool InTradingSession(datetime t)
    bool dayOn = true;
    int s1h=0, s1m=0, e1h=0, e1m=0, s2h=0, s2m=0, e2h=0, e2m=0;
 
-   if(dow == 1)      { dayOn = MondayTrading;    s1h=MonStart1_Hour; s1m=MonStart1_Minute; e1h=MonEnd1_Hour; e1m=MonEnd1_Minute; s2h=MonStart2_Hour; s2m=MonStart2_Minute; e2h=MonEnd2_Hour; e2m=MonEnd2_Minute; }
-   else if(dow == 2) { dayOn = TuesdayTrading;   s1h=TueStart1_Hour; s1m=TueStart1_Minute; e1h=TueEnd1_Hour; e1m=TueEnd1_Minute; s2h=TueStart2_Hour; s2m=TueStart2_Minute; e2h=TueEnd2_Hour; e2m=TueEnd2_Minute; }
-   else if(dow == 3) { dayOn = WednesdayTrading; s1h=WedStart1_Hour; s1m=WedStart1_Minute; e1h=WedEnd1_Hour; e1m=WedEnd1_Minute; s2h=WedStart2_Hour; s2m=WedStart2_Minute; e2h=WedEnd2_Hour; e2m=WedEnd2_Minute; }
-   else if(dow == 4) { dayOn = ThursdayTrading;  s1h=ThuStart1_Hour; s1m=ThuStart1_Minute; e1h=ThuEnd1_Hour; e1m=ThuEnd1_Minute; s2h=ThuStart2_Hour; s2m=ThuStart2_Minute; e2h=ThuEnd2_Hour; e2m=ThuEnd2_Minute; }
-   else if(dow == 5) { dayOn = FridayTrading;    s1h=FriStart1_Hour; s1m=FriStart1_Minute; e1h=FriEnd1_Hour; e1m=FriEnd1_Minute; s2h=FriStart2_Hour; s2m=FriStart2_Minute; e2h=FriEnd2_Hour; e2m=FriEnd2_Minute; }
+   if(dow == 1)      { dayOn = MondayTrading;    s1h=MonStart1Hour; s1m=MonStart1Minute; e1h=MonEnd1Hour; e1m=MonEnd1Minute; s2h=MonStart2Hour; s2m=MonStart2Minute; e2h=MonEnd2Hour; e2m=MonEnd2Minute; }
+   else if(dow == 2) { dayOn = TuesdayTrading;   s1h=TueStart1Hour; s1m=TueStart1Minute; e1h=TueEnd1Hour; e1m=TueEnd1Minute; s2h=TueStart2Hour; s2m=TueStart2Minute; e2h=TueEnd2Hour; e2m=TueEnd2Minute; }
+   else if(dow == 3) { dayOn = WednesdayTrading; s1h=WedStart1Hour; s1m=WedStart1Minute; e1h=WedEnd1Hour; e1m=WedEnd1Minute; s2h=WedStart2Hour; s2m=WedStart2Minute; e2h=WedEnd2Hour; e2m=WedEnd2Minute; }
+   else if(dow == 4) { dayOn = ThursdayTrading;  s1h=ThuStart1Hour; s1m=ThuStart1Minute; e1h=ThuEnd1Hour; e1m=ThuEnd1Minute; s2h=ThuStart2Hour; s2m=ThuStart2Minute; e2h=ThuEnd2Hour; e2m=ThuEnd2Minute; }
+   else if(dow == 5) { dayOn = FridayTrading;    s1h=FriStart1Hour; s1m=FriStart1Minute; e1h=FriEnd1Hour; e1m=FriEnd1Minute; s2h=FriStart2Hour; s2m=FriStart2Minute; e2h=FriEnd2Hour; e2m=FriEnd2Minute; }
 
    if(!dayOn) return false;
 

@@ -16,6 +16,26 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/). Version
 
 - Variants S3.2c (Pyramid-only during MMD-trend) and S3.2d (pure trend-follow) remain in plan as next iterations if WT shows live deficiencies.
 
+### 3.0 naming refactor (2026-05-24)
+
+**BREAKING for users holding old `.set` files** — 61 inputs renamed to consistent PascalCase. Shipped `.set` files were migrated automatically; user `.set` files need re-export or manual rename.
+
+**Input renames** (61 total):
+- camelCase → PascalCase (9): `maPeriod→MAPeriod`, `slopeLookbackBars→SlopeLookbackBars`, `slopeThresholdPts→SlopeThresholdPts`, `strongTrendPts→StrongTrendPts`, `startBe→StartBE`, `lotMultiplier→LotMultiplier`, `lotMultiplierRange→LotMultiplierRange`, `bePoints→BEPoints`, `maxLot→MaxLot`
+- PascalCase_underscore → PascalCase (52): all 40 day/slot/HM trading-window inputs (`MonStart1_Hour→MonStart1Hour` etc.), `TP_Points`, `SL_Points`, `MaxBasketDD_Pct`, `MaxEquityDD_Pct`, `RunnerBE_StartPts`, all 7 `MMDPeriod_*` cloud inputs
+
+**Global renames** (22 total): all `g_snake_case` globals renamed to `g_camelCase` for consistency. Internal only — no user-visible impact.
+
+**Verification**: mar25 H1 STEP re-run = bit-identical to baseline ($1850.91 / 22.18% DD / 1722 trades). Pure rename, no functional change.
+
+**Tooling**: `scripts/_naming_refactor.py` applies code renames; `scripts/_rename_set_file.py` migrates `.set` files. Both word-boundary-safe via regex.
+
+**Migration for users**:
+- If your `.set` file was exported from MD ≤ 2.0 ship: open in text editor, apply the renames above. OR re-export from the EA after upgrade.
+- Inputs not in the rename table (`PriceStep`, `BurstTicks`, `MinMovePoints`, `MaxSpreadPts`, `LotsBase`, `LotsBasePerThousand`, `MaxBasketLossPct`, `MaxAllTimeDDPct`, `FridayFlattenHour`, etc.) are unchanged.
+
+See `docs/NAMING.md` for full rename table + rationale.
+
 ### Added — S2.C.8 Daily pre-close flatten (2026-05-21)
 - **New inputs** (Inputs.mqh, default OFF): `DailyPreCloseHour` (recommend 23), `DailyPreCloseMinute` (recommend 55), `DailyResumeHour` (recommend 1). Mirror of `FridayFlattenHour` but daily — closes all positions before the XAU daily-break window (~00:00 UTC), resumes next morning.
 - **`EnforceDailyPreClose()` function** (Risk.mqh) — fires once per day after `DailyPreCloseHour:DailyPreCloseMinute`, closes all positions, pauses until next day at `DailyResumeHour:00`. Skips Saturday. Defers to S1.7 Friday flatten and S1.3 daily-loss kill via the existing `IsAutoPaused()` short-circuit.

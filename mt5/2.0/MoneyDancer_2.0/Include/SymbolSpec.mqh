@@ -91,7 +91,7 @@ bool VerifySymbolSpec()
 
    // Soft warnings — info only
    if(stopsLevel > 100)
-      PrintFormat("[PL.3] WARN: stops_level=%d > 100 — broker requires stops far from price (may interact with bePoints/TP_Points=60/65)", stopsLevel);
+      PrintFormat("[PL.3] WARN: stops_level=%d > 100 — broker requires stops far from price (may interact with BEPoints/TPPoints=60/65)", stopsLevel);
    if(MathAbs(swapLong) > 100.0 || MathAbs(swapShort) > 100.0)
       PrintFormat("[PL.3] WARN: swap is unusually large (long=%.2f short=%.2f) — multi-day baskets will accumulate cost", swapLong, swapShort);
 

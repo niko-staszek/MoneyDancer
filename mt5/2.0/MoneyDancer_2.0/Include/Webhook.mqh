@@ -124,7 +124,12 @@ void WebhookCheckAndFire()
    MqlDateTime mdt;
    TimeToStruct(now, mdt);
 
-   // Only fire after the EOD cutoff time
+   // Only fire after the EOD cutoff time.
+   // CR-M11 note: if EA attaches AFTER the cutoff time on day-of-attach
+   // (e.g., user starts EA at 23:00 with WebhookEodHour=22:30), this
+   // condition is true immediately and the first OnTimer call (60s later)
+   // pushes the EOD summary right away. That's intentional — operator
+   // gets a startup snapshot via the same channel.
    bool past_cutoff = (mdt.hour > WebhookEodHour) ||
                       (mdt.hour == WebhookEodHour && mdt.min >= WebhookEodMinute);
    if(!past_cutoff) return;

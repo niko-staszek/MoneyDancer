@@ -17,15 +17,15 @@
 //+------------------------------------------------------------------+
 bool SlopeInit()
 {
-   g_ma_handle_main  = iMA(_Symbol, _Period, maPeriod,            0, MODE_EMA, PRICE_CLOSE);
-   g_ma_handle_pyram = iMA(_Symbol, _Period, PyramSlopeEmaPeriod, 0, MODE_EMA, PRICE_CLOSE);
+   g_maHandleMain  = iMA(_Symbol, _Period, MAPeriod,            0, MODE_EMA, PRICE_CLOSE);
+   g_maHandlePyram = iMA(_Symbol, _Period, PyramSlopeEmaPeriod, 0, MODE_EMA, PRICE_CLOSE);
 
-   if(g_ma_handle_main == INVALID_HANDLE)
+   if(g_maHandleMain == INVALID_HANDLE)
    {
-      Print("SlopeInit: failed to create main MA handle (period=", maPeriod, ")");
+      Print("SlopeInit: failed to create main MA handle (period=", MAPeriod, ")");
       return false;
    }
-   if(g_ma_handle_pyram == INVALID_HANDLE)
+   if(g_maHandlePyram == INVALID_HANDLE)
    {
       Print("SlopeInit: failed to create pyram MA handle (period=", PyramSlopeEmaPeriod, ")");
       return false;
@@ -35,15 +35,15 @@ bool SlopeInit()
 
 void SlopeDeinit()
 {
-   if(g_ma_handle_main != INVALID_HANDLE)
+   if(g_maHandleMain != INVALID_HANDLE)
    {
-      IndicatorRelease(g_ma_handle_main);
-      g_ma_handle_main = INVALID_HANDLE;
+      IndicatorRelease(g_maHandleMain);
+      g_maHandleMain = INVALID_HANDLE;
    }
-   if(g_ma_handle_pyram != INVALID_HANDLE)
+   if(g_maHandlePyram != INVALID_HANDLE)
    {
-      IndicatorRelease(g_ma_handle_pyram);
-      g_ma_handle_pyram = INVALID_HANDLE;
+      IndicatorRelease(g_maHandlePyram);
+      g_maHandlePyram = INVALID_HANDLE;
    }
 }
 
@@ -70,14 +70,14 @@ void UpdateSlopeCacheIfNewBar()
 
    g_lastBarTime = barTime;
 
-   double ma0 = MA_Value(g_ma_handle_main, 0);
-   double maL = MA_Value(g_ma_handle_main, slopeLookbackBars);
+   double ma0 = MA_Value(g_maHandleMain, 0);
+   double maL = MA_Value(g_maHandleMain, SlopeLookbackBars);
    if(ma0 == 0.0 || maL == 0.0) return;  // buffer not yet populated
 
    g_cachedSlopePts = (int)MathRound((ma0 - maL) / _Point);
 
-   if(g_cachedSlopePts >= slopeThresholdPts)       g_cachedSlopeDir = +1;
-   else if(g_cachedSlopePts <= -slopeThresholdPts) g_cachedSlopeDir = -1;
+   if(g_cachedSlopePts >= SlopeThresholdPts)       g_cachedSlopeDir = +1;
+   else if(g_cachedSlopePts <= -SlopeThresholdPts) g_cachedSlopeDir = -1;
    else                                             g_cachedSlopeDir = 0;
 }
 
@@ -91,8 +91,8 @@ int MarketSlopeStrengthPtsCached()  { return g_cachedSlopePts; }
 double PyramSlopeAngleCurrentDeg()
 {
    int lb = MathMax(1, PyramSlopeLookbackBars);
-   double e0 = MA_Value(g_ma_handle_pyram, 0);
-   double eL = MA_Value(g_ma_handle_pyram, lb);
+   double e0 = MA_Value(g_maHandlePyram, 0);
+   double eL = MA_Value(g_maHandlePyram, lb);
    if(e0 == 0.0 || eL == 0.0) return 0.0;
 
    double diffPts = (e0 - eL) / _Point;

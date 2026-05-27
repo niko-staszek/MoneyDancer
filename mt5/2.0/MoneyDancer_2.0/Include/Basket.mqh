@@ -258,6 +258,10 @@ bool CalcBasketBEWithCostsSeries(int dir, string seriesKey, double &beOut)
    double plo = BasketProfitAtPriceSeries(arr, n, lo);
    double phi = plo;
 
+   // CR-M5: 200 pts is the BE-search bracket-expansion step. Chosen for XAU
+   // where typical basket BE lies within ~2000 pts of current price; 40 steps
+   // × 200 pts = ±8000 pt search window. Pairs with maxExpand=40 to bound
+   // worst-case iteration count.
    int    maxExpand = 40;
    double step      = 200 * _Point;
 
@@ -490,7 +494,7 @@ bool EquityGuardTriggered()
    if(bal <= 0) return false;
 
    double ddPct = (bal - eq) / bal * 100.0;
-   return (ddPct >= MaxEquityDD_Pct);
+   return (ddPct >= MaxEquityDDPct);
 }
 
 bool BasketGuardTriggered(int dir)
@@ -502,7 +506,7 @@ bool BasketGuardTriggered(int dir)
    if(pl >= 0) return false;
 
    double lossPct = (-pl) / bal * 100.0;
-   return (lossPct >= MaxBasketDD_Pct);
+   return (lossPct >= MaxBasketDDPct);
 }
 
 //+------------------------------------------------------------------+
@@ -572,7 +576,7 @@ bool TrendBlocksD(int basketDir)
    if(UseSlopeFilter)
    {
       int slopePts = MarketSlopeStrengthPtsCached();
-      if(MathAbs(slopePts) >= strongTrendPts)
+      if(MathAbs(slopePts) >= StrongTrendPts)
       {
          if(basketDir < 0 && slopePts > 0) return true;
          if(basketDir > 0 && slopePts < 0) return true;

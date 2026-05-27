@@ -38,7 +38,7 @@ bool HasAnyRunnersOpen()
 }
 
 //+------------------------------------------------------------------+
-//| Trailing management for runners: BE once +RunnerBE_StartPts;     |
+//| Trailing management for runners: BE once +RunnerBEStartPts;     |
 //| trailing stop at +RunnerTrailDistPts behind price.                |
 //|                                                                   |
 //| Uses trade.PositionModify directly (not ModifyPositionSLTP)       |
@@ -68,7 +68,7 @@ void ManageRunnersTrailing()
       int profitPts = (int)(((typ == POSITION_TYPE_BUY) ? (cur - op) : (op - cur)) / _Point);
 
       // Stage 1: move SL to BE once profit crosses the start threshold.
-      if(profitPts >= RunnerBE_StartPts)
+      if(profitPts >= RunnerBEStartPts)
       {
          double beSL = NormalizeDouble(op, _Digits);
          if(typ == POSITION_TYPE_BUY)
@@ -84,7 +84,7 @@ void ManageRunnersTrailing()
       }
 
       // Stage 2: trail at RunnerTrailDistPts behind price, stepping in RunnerTrailStepPts chunks.
-      if(profitPts >= (RunnerBE_StartPts + RunnerTrailDistPts))
+      if(profitPts >= (RunnerBEStartPts + RunnerTrailDistPts))
       {
          double newSL = (typ == POSITION_TYPE_BUY)
                            ? cur - RunnerTrailDistPts * _Point
@@ -193,13 +193,13 @@ bool CheckShouldActivateE(int basketDir, string &reason)
 
    if(EquityGuardTriggered())
    {
-      reason = "EQUITY DD > " + DoubleToString(MaxEquityDD_Pct, 1) + "%";
+      reason = "EQUITY DD > " + DoubleToString(MaxEquityDDPct, 1) + "%";
       return true;
    }
 
    if(BasketGuardTriggered(basketDir))
    {
-      reason = "BASKET DD > " + DoubleToString(MaxBasketDD_Pct, 1) + "%";
+      reason = "BASKET DD > " + DoubleToString(MaxBasketDDPct, 1) + "%";
       return true;
    }
 
@@ -244,7 +244,7 @@ void TryOpenRunner(int losingBasketDir, string reason)
 
    // Runner opens with a realistic hedge TP (BE-start + trail-distance).
    // Trailing SL typically closes first; TP acts as audit-visible target.
-   int runnerTPPts = RunnerBE_StartPts + RunnerTrailDistPts;
+   int runnerTPPts = RunnerBEStartPts + RunnerTrailDistPts;
    bool opened = SendOrder(hedgeDir, lot, true, runnerTPPts, true, cmt);
 
    if(opened)
