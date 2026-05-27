@@ -47,6 +47,7 @@
 #include "Include/RailStatePersist.mqh"
 #include "Include/SymbolSpec.mqh"
 #include "Include/Webhook.mqh"
+#include "Include/RegimeTrace.mqh"
 #include "Include/Orders.mqh"
 #include "Include/Slope.mqh"
 #include "Include/MMD.mqh"
@@ -124,6 +125,9 @@ int OnInit()
    // PL.4 — open today's telemetry CSV + log init event.
    TelemetryInit();
 
+   // S2.C.9 — per-trade regime trace (tester-allowed, default OFF).
+   RegimeTrace_Init();
+
    // PL.1 — 60s heartbeat to persist rail state (mirrors what live needs).
    if(!MQLInfoInteger(MQL_TESTER))
       EventSetTimer(60);
@@ -150,6 +154,9 @@ void OnDeinit(const int reason)
 
    // PL.4 — log deinit event + close CSV.
    TelemetryDeinit(reason);
+
+   // S2.C.9 — close regime trace CSV.
+   RegimeTrace_Deinit();
 
    // Stop the heartbeat timer if we set one.
    if(!MQLInfoInteger(MQL_TESTER))

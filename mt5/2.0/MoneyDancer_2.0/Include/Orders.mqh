@@ -180,14 +180,25 @@ ulong OpenPosition(int dir, double lots, double sl, double tp, string comment)
    // brokers, ResultOrder() equals the position ticket. If not, fall back
    // to the deal lookup.
    ulong order_ticket = trade.ResultOrder();
+   ulong resolved = 0;
    if(order_ticket > 0 && PositionSelectByTicket(order_ticket))
-      return order_ticket;
+      resolved = order_ticket;
 
-   ulong deal_ticket = trade.ResultDeal();
-   if(deal_ticket > 0 && HistoryDealSelect(deal_ticket))
-      return (ulong)HistoryDealGetInteger(deal_ticket, DEAL_POSITION_ID);
+   if(resolved == 0)
+   {
+      ulong deal_ticket = trade.ResultDeal();
+      if(deal_ticket > 0 && HistoryDealSelect(deal_ticket))
+         resolved = (ulong)HistoryDealGetInteger(deal_ticket, DEAL_POSITION_ID);
+   }
 
-   return 0;
+   // S2.C.9 — per-trade regime trace (no-op if UseRegimeTrace=false).
+   if(resolved > 0)
+   {
+      int basketId = (dir > 0 ? g_buySeriesId : g_sellSeriesId);
+      RegimeTrace_LogOpen(resolved, dir, lots, price, basketId);
+   }
+
+   return resolved;
 }
 
 //+------------------------------------------------------------------+

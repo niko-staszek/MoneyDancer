@@ -230,6 +230,13 @@ input int    DailyResumeHour       = 1;   // S2.C.8 Hour server time to resume n
 // >0.0 = only close baskets whose floating loss >= X% of equity. Lets winning baskets run.
 input double DailyPreCloseLossThresholdPct = 0.0; // S2.C.8 Close only if basket floating loss >= % equity (0=close all)
 
+// S2.C.9 — Per-trade regime trace (tester-allowed CSV log). Default OFF.
+// When ON, writes one row per trade open + close with regime + slope label
+// to MoneyDancer_regime_<Magic>_<Symbol>.csv. Post-process with
+// scripts/_s2c9_regime_breakdown.py to aggregate (DOW × regime × hour) P&L.
+// Different from PL.4 Telemetry which is live-only; this works in tester.
+input bool   UseRegimeTrace        = false; // S2.C.9 Enable per-trade regime trace CSV
+
 // PL.5 — Daily EOD summary webhook (Discord/Telegram). Default OFF.
 // REQUIRES: add webhook URL to Tools > Options > Expert Advisors > "Allow WebRequest for listed URL".
 // Format auto-detected: URL containing "telegram" uses Telegram bot API ({"text":...});
