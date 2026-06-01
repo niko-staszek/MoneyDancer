@@ -9,17 +9,21 @@ the terminal. Result parsing is opt_parse.py.
 import argparse, subprocess, sys, time
 from pathlib import Path
 
-# lever -> (start, step, stop)
+# lever -> (start, step, stop).
+# NOTE: names MUST match the current EA's camelCase inputs (v2.0+2 migrated from
+# underscore -> camelCase: LotMultiplier/TPPoints/BEPoints/StartBE/MaxBasketDDPct).
+# A mismatched key is silently ignored by MT5 (uses the default) — verified by the
+# "params take effect" discriminator before any optimization is trusted.
 SWEEP = {
-    "lotMultiplier":       ("1.0", "0.5", "4.0"),
+    "LotMultiplier":       ("1.0", "0.5", "4.0"),
     "MaxOrdersDir":        ("10",  "10",  "50"),
     "MaxBasketLossPct":    ("2",   "2",   "8"),
     "StepPoints":          ("40",  "20",  "120"),
-    "TP_Points":           ("30",  "10",  "80"),
-    "bePoints":            ("30",  "10",  "80"),
+    "TPPoints":            ("30",  "10",  "80"),
+    "BEPoints":            ("30",  "10",  "80"),
     "MinOrderDistancePts": ("20",  "20",  "80"),
-    "MaxBasketDD_Pct":     ("20",  "10",  "60"),
-    "startBe":             ("1",   "1",   "5"),
+    "MaxBasketDDPct":      ("20",  "10",  "60"),
+    "StartBE":             ("1",   "1",   "5"),
     "MinMovePoints":       ("15",  "10",  "45"),
 }
 
