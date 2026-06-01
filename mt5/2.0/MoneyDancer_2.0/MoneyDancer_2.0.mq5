@@ -268,6 +268,20 @@ void OnChartEvent(const int id,
 //+------------------------------------------------------------------+
 double OnTester()
 {
-   return(0.0);
+   if(g_ulcerSamples <= 0 || g_tradingDays <= 0) return(0.0);
+
+   double ulcer   = MathSqrt(g_ulcerSumSqDD / (double)g_ulcerSamples);
+   double profit  = TesterStatistics(STAT_PROFIT);
+   double deposit = TesterStatistics(STAT_INITIAL_DEPOSIT);
+   double maxDD   = TesterStatistics(STAT_EQUITYDD_PERCENT);
+   double retPct  = (deposit > 0.0) ? (profit / deposit * 100.0) : 0.0;
+   double dailyAvg= retPct / (double)g_tradingDays;
+
+   // Gates (ordered-negative so the GA still has a gradient to climb out):
+   if(maxDD > 40.0)     return(-1000.0 - maxDD);
+   if(dailyAvg < 1.5)   return(-100.0 - (1.5 - dailyAvg) * 100.0);
+
+   // Smoothness-adjusted return: higher = smoother per unit of return.
+   return(retPct / (ulcer + 1e-6));
 }
 //+------------------------------------------------------------------+

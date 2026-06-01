@@ -24,6 +24,12 @@ datetime g_posLastSync = 0;
 int      g_maHandleMain  = INVALID_HANDLE;  // main slope filter EMA (MAPeriod)
 int      g_maHandlePyram = INVALID_HANDLE;  // pyramid slope EMA (PyramSlopeEmaPeriod)
 datetime g_lastBarTime     = 0;
+// Smoothness (Ulcer) accumulation for OnTester() — sampled once per new bar.
+double   g_ulcerSumSqDD  = 0.0;   // sum of (drawdown%)^2
+long     g_ulcerSamples  = 0;     // bar samples
+datetime g_ulcerLastBar  = 0;     // last sampled bar time
+datetime g_ulcerLastDate = 0;     // last sampled UTC date (for trading-day count)
+long     g_tradingDays   = 0;     // distinct trading days seen
 int      g_cachedSlopeDir  = 0;   // +1 up, 0 flat, -1 down
 int      g_cachedSlopePts  = 0;
 

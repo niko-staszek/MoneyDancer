@@ -254,6 +254,17 @@ void UpdateMaxDD()
    {
       double ddEver = (g_peakEquityEver - equity) / g_peakEquityEver * 100.0;
       if(ddEver > g_maxDDEver) g_maxDDEver = ddEver;
+
+      // Sample Ulcer once per new bar (not per tick — keep it volatility-neutral).
+      datetime bt = iTime(_Symbol, PERIOD_CURRENT, 0);
+      if(bt != g_ulcerLastBar)
+      {
+         g_ulcerLastBar = bt;
+         g_ulcerSumSqDD += ddEver * ddEver;
+         g_ulcerSamples += 1;
+         datetime d = bt - (bt % 86400);
+         if(d != g_ulcerLastDate) { g_ulcerLastDate = d; g_tradingDays += 1; }
+      }
    }
 }
 
