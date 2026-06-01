@@ -64,6 +64,7 @@ def build_ini(
     leverage: int,
     report_name: str,
     expert_rel_path: str,
+    model: int = 0,
 ) -> str:
     """Build the .ini content (text form before UTF-16 encoding)."""
     lines: list[str] = []
@@ -73,7 +74,7 @@ def build_ini(
     lines.append(f"Symbol={symbol}")
     lines.append(f"Period={period}")
     lines.append("Optimization=0")
-    lines.append("Model=0")  # every tick based on real ticks
+    lines.append(f"Model={model}")  # 0=every real tick, 1=1-min OHLC (faster)
     lines.append(f"FromDate={from_date}")
     lines.append(f"ToDate={to_date}")
     lines.append("ForwardMode=0")
@@ -122,6 +123,7 @@ def main() -> int:
     ap.add_argument("--run-id", required=True, help="Run identifier (e.g. F0-5k-heavy-grid)")
     ap.add_argument("--symbol", default="XAUUSD")
     ap.add_argument("--period", default="M5")
+    ap.add_argument("--model", type=int, default=0, help="Tester model: 0=every real tick, 1=1-min OHLC (faster)")
     ap.add_argument("--from-date", default="2026.01.01")
     ap.add_argument("--to-date", default="2026.05.14")
     ap.add_argument("--deposit", type=float, default=100000)
@@ -169,6 +171,7 @@ def main() -> int:
         leverage=args.leverage,
         report_name=report_name,
         expert_rel_path=args.expert,
+        model=args.model,
     )
     ini_path = TESTER_PROFILE / f"{args.run_id}.ini"
     write_utf16(ini_path, ini_text)
