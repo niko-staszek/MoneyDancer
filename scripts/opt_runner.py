@@ -83,6 +83,8 @@ def main():
     ap.add_argument("--levers", nargs="+", default=None,
                     help="subset of SWEEP levers to optimize (default: all). e.g. --levers LotMultiplier MaxOrdersDir")
     ap.add_argument("--opt-mode", type=int, default=1, help="1=full grid (small batch), 2=genetic")
+    ap.add_argument("--set-override", action="append", default=[],
+                    help="KEY=VALUE fixed-input override (carry batch winners forward). Repeatable.")
     ap.add_argument("--timeout", type=int, default=86400)
     a = ap.parse_args()
     if a.levers:
@@ -90,6 +92,10 @@ def main():
         if bad:
             print(f"[OPT] ERROR: unknown levers {bad}; valid: {list(SWEEP)}"); return
     fixed = parse_set(a.set_file)
+    for ov in a.set_override:
+        if "=" in ov:
+            k, v = ov.split("=", 1); fixed[k] = v
+            print(f"[OPT] fixed override {k}={v}")
     report = f"{a.run_id}-opt"
     ini = build_opt_ini(fixed, a.symbol, a.from_date, a.to_date, a.deposit, a.expert, report,
                         active=a.levers, opt_mode=a.opt_mode)
