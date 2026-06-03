@@ -15,7 +15,7 @@ from pathlib import Path
 # A mismatched key is silently ignored by MT5 (uses the default) — verified by the
 # "params take effect" discriminator before any optimization is trusted.
 SWEEP = {
-    "LotMultiplier":       ("1.0", "0.5", "4.0"),
+    "LotMultiplier":       ("1.0", "0.5", "2.5"),  # capped: detune zone (4.0 = slow + the aggression we cut)
     "MaxOrdersDir":        ("10",  "10",  "50"),
     "MaxBasketLossPct":    ("2",   "2",   "8"),
     "StepPoints":          ("40",  "20",  "120"),
@@ -31,22 +31,25 @@ TERMINAL = Path(r"C:\Program Files\RoboForex MT5 Terminal\terminal64.exe")
 DATA = Path(r"C:\Users\nikof\AppData\Roaming\MetaQuotes\Terminal\5FFA568149E88FCD5B44D926DCFEAA79")
 PROFILE = DATA / "MQL5" / "Profiles" / "Tester"
 
-def build_opt_inputs(fixed):
-    """fixed: {input_name: value} for ALL inputs (from a parsed .set). Swept levers get ranges."""
+def build_opt_inputs(fixed, active=None):
+    """fixed: {input_name: value} for ALL inputs (from a parsed .set). Only levers in
+    `active` (subset of SWEEP) get optimization ranges; the rest are fixed. active=None
+    means sweep ALL SWEEP levers (whole-set behaviour)."""
+    act = set(SWEEP) if active is None else set(active)
     lines = []
     for k, v in fixed.items():
-        if k in SWEEP:
+        if k in SWEEP and k in act:
             start, step, stop = SWEEP[k]
             lines.append(f"{k}={v}||{start}||{step}||{stop}||Y")
         else:
             lines.append(f"{k}={v}")
     return "\r\n".join(lines) + "\r\n"
 
-def build_opt_ini(fixed, symbol, frm, to, deposit, expert, report):
+def build_opt_ini(fixed, symbol, frm, to, deposit, expert, report, active=None, opt_mode=1):
     head = [
-        "; smoothness-detune genetic optimization", "[Tester]",
+        "; smoothness-detune optimization", "[Tester]",
         f"Expert={expert}", f"Symbol={symbol}", "Period=M5",
-        "Optimization=2",            # 2 = genetic algorithm
+        f"Optimization={opt_mode}",  # 1 = full grid (small batches), 2 = genetic
         "Model=0",                   # every real tick (mandatory for this EA)
         f"FromDate={frm}", f"ToDate={to}", "ForwardMode=0",
         f"Deposit={deposit:g}", "Currency=USD", "Leverage=500", "ExecutionMode=40",
@@ -54,7 +57,7 @@ def build_opt_ini(fixed, symbol, frm, to, deposit, expert, report):
         "Visual=0", f"Report={report}", "ReplaceReport=1", "ShutdownTerminal=1", "",
         "[TesterInputs]",
     ]
-    return "\r\n".join(head) + "\r\n" + build_opt_inputs(fixed)
+    return "\r\n".join(head) + "\r\n" + build_opt_inputs(fixed, active)
 
 def parse_set(path):
     out = {}
@@ -77,11 +80,19 @@ def main():
     ap.add_argument("--to-date", required=True)
     ap.add_argument("--deposit", type=float, default=100000)
     ap.add_argument("--expert", default=r"MoneyDancer_2.0\MoneyDancer_2.0.ex5")
+    ap.add_argument("--levers", nargs="+", default=None,
+                    help="subset of SWEEP levers to optimize (default: all). e.g. --levers LotMultiplier MaxOrdersDir")
+    ap.add_argument("--opt-mode", type=int, default=1, help="1=full grid (small batch), 2=genetic")
     ap.add_argument("--timeout", type=int, default=86400)
     a = ap.parse_args()
+    if a.levers:
+        bad = [l for l in a.levers if l not in SWEEP]
+        if bad:
+            print(f"[OPT] ERROR: unknown levers {bad}; valid: {list(SWEEP)}"); return
     fixed = parse_set(a.set_file)
     report = f"{a.run_id}-opt"
-    ini = build_opt_ini(fixed, a.symbol, a.from_date, a.to_date, a.deposit, a.expert, report)
+    ini = build_opt_ini(fixed, a.symbol, a.from_date, a.to_date, a.deposit, a.expert, report,
+                        active=a.levers, opt_mode=a.opt_mode)
     ini_path = PROFILE / f"{a.run_id}.ini"
     ini_path.write_text(ini, encoding="utf-16")
     print(f"[OPT] wrote {ini_path}; launching genetic optimization ...")
