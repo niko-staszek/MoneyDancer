@@ -25,3 +25,9 @@ mar25 14 deals -1.4% | jul25 18 deals +1.1% | nov25 20 deals +2.4% (sep25 glitch
 - NOT a generalizable everywhere-edge. Regime-selective grid. No 2024 data to test further.
 
 ## NEXT: full 2025 native-1.2 sweep (12 cells, scripts/sweep_2025_native.py) to confirm regime-selective vs 2026-luck.
+
+## FULL 2025 native-1.2 sweep (12 cells) — CONCLUSIVE: +65% is 2026-ONLY
+Active 12/12 cells (20-106 deals). 2025 TOTAL ret +3.2% (mean 0.27%/cell, 3 neg cells, worst apr25 -6.5%/DD8.8%).
+vs 2026 4mo +64.8%. => +65% entirely 2026-regime (big directional gold); 2025 flat-but-safe (DDs <2% mostly).
+NO year-round edge. BUT best-behaved grid tested: doesn't blow up in quiet, rides trends. Better forward-test
+candidate than STEP (STEP LOST on same 2026 months + runs ~40% DD). Verdict: trend-rider, not money-printer.
