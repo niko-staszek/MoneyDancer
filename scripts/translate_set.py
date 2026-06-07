@@ -20,7 +20,13 @@ RENAME = {
     "slopeLookbackBars": "SlopeLookbackBars", "slopeThresholdPts": "SlopeThresholdPts",
     "strongTrendPts": "StrongTrendPts", "MaxBasketDD_Pct": "MaxBasketDDPct",
     "MaxEquityDD_Pct": "MaxEquityDDPct", "RunnerBE_StartPts": "RunnerBEStartPts",
+    "maxLot": "MaxLot",
 }
+
+def _fixname(k):
+    # per-weekday underscore hours: MonStart1_Hour -> MonStart1Hour, ThuEnd2_Minute -> ThuEnd2Minute
+    m = re.match(r"^((?:Mon|Tue|Wed|Thu|Fri)(?:Start|End)[12])_(Hour|Minute)$", k)
+    return f"{m.group(1)}{m.group(2)}" if m else RENAME.get(k, k)
 WEEKDAYS = ["Mon", "Tue", "Wed", "Thu", "Fri"]
 
 def translate(src):
@@ -45,7 +51,7 @@ def translate(src):
             out[f"{d}End2Hour"] = "0"; out[f"{d}End2Minute"] = "0"
     # remaining params: rename then validate against EA inputs
     for k, v in raw.items():
-        nk = RENAME.get(k, k)
+        nk = _fixname(k)
         if nk in EA_INPUTS:
             out[nk] = v
         else:
