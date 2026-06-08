@@ -94,6 +94,7 @@ input int    StrongTrendPts        = 60;     // Threshold for detecting strong d
 //==================== TRADING ====================
 input string SecOrdersSlTp = "==== Orders & SL & TP ====";
 input double LotsBase              = 0.01;  // Basic Order Size
+input double LotsBasePerThousand   = 0.0;   // >0: base lot = equity/1000 * this (0 = fixed LotsBase)
 input int    TpPoints             = 50;    // Take Profit for Basic Order
 input int    SlPoints             = 0;     // Stop Loss for Basic Order (MT4 original)
 input int    Slippage              = 10;    // Accepted slippage for price

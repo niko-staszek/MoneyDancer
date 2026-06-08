@@ -36,6 +36,15 @@ double ClampLot(double lot)
    return lot;
 }
 
+// Base order lot. When LotsBasePerThousand>0, scale by current equity
+// (equity/1000 * that), clamped to broker limits; else the fixed LotsBase.
+double ComputeBaseLot()
+{
+   if(LotsBasePerThousand <= 0.0) return LotsBase;
+   double eq = AccountInfoDouble(ACCOUNT_EQUITY);
+   return ClampLot((eq / 1000.0) * LotsBasePerThousand);
+}
+
 //==================== POSITION OWNERSHIP HELPERS ====================
 // These assume the caller has already done PositionSelectByTicket(ticket)
 // or is iterating PositionsTotal() + PositionGetTicket(i).

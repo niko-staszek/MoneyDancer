@@ -217,7 +217,7 @@ void TryOpenRunner(int losingBasketDir, string reason)
    if(runnersLots >= maxAllowed) return;
 
    double remaining = maxAllowed - runnersLots;
-   double lot = MathMin(LotsBase, remaining);
+   double lot = MathMin(ComputeBaseLot(), remaining);
    lot = ClampLot(lot);
    if(lot <= 0) return;
 
