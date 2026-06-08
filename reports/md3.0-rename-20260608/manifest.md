@@ -1,0 +1,6 @@
+a78a75d5038875ea  5838  NAMING.md
+0cfde47ce56cd507  12013  TEST_13a_M30_1.2.set
+b99b4645e269564a  1000  result.md
+84df67da901fd5e8  2194  test13a_3.0.set
+649b28256781da82  1160088  trades_1.2.csv
+649b28256781da82  1160088  trades_3.0.csv
