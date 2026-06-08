@@ -2,7 +2,7 @@
 """Run all the author's #GOLD sets NATIVE on MoneyDancer 1.2 (no translation - 1.2 IS
 their scheme). MaxSpreadPts overridden to 45 (their 15 blocks duka_robo spread 25-28).
 2026 4-month window. Tabulate to find the author's pattern + understand the EA."""
-import subprocess, sys
+import subprocess, sys, time
 from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from detune_metrics import ulcer_index, max_dd_pct, daily_avg_pct, losing_basket_count
@@ -12,7 +12,7 @@ WT = Path(__file__).resolve().parents[1]
 DL = "C:/Users/nikof/Downloads"
 EXPERT = r"MoneyDancer_1.2\MoneyDancer_1.2.ex5"
 SYM = "XAUUSD.duk_robo"
-FRM, TO = "2026.02.01", "2026.05.14"
+FRM, TO = "2026.04.06", "2026.04.13"   # 1-week sample (tight-scalp PriceStep=0.20 configs are too slow on 4mo every-tick)
 
 # (run_id, set_file, period, deposit)
 RUNS = [
@@ -47,6 +47,12 @@ def run(rid, setf, period, dep):
             "dailyavg%": round(daily_avg_pct(d, dep), 2), "losers": losing_basket_count(d), "maxlot": d.volume.max()}
 
 def main():
+    # one-time pre-clean: kill any lingering terminal/agents so the FIRST /config runs the
+    # test (not attach to an existing instance). Do NOT kill between runs — that breaks the
+    # agent pool and stalls run 2+ (f0_runner's ShutdownTerminal handles per-run cleanup).
+    for proc in ("terminal64.exe", "metatester64.exe"):
+        subprocess.run(["taskkill", "/IM", proc, "/F"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    time.sleep(6)
     res = {}
     for r in RUNS:
         print(f"--- {r[0]} ({r[2]}, dep {r[3]}) ---"); res[r[0]] = run(*r)
