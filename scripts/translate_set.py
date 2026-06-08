@@ -73,3 +73,15 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+
+def to_3_0(src, out):
+    """Port a 1.2-scheme .set to 3.0 input names (rule-identical to the EA rename)."""
+    import sys, pathlib
+    sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+    from v3_namemap import to_v3
+    from f0_runner import parse_set_file
+    raw = parse_set_file(pathlib.Path(src))
+    ported = {to_v3(k): v for k, v in raw.items()}
+    pathlib.Path(out).write_text("\n".join(f"{k}={v}" for k, v in ported.items()) + "\n", encoding="utf-8")
+    return ported
