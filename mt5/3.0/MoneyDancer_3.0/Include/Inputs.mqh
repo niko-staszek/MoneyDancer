@@ -110,6 +110,14 @@ input double MaxLot                = 0.0;   // Max Lot Size
 input int    MaxOrdersDir          = 50;    // Max Orders in one Direction
 input int    StepPoints            = 120;   // After X points let MOE run
 input int    MinOrderDistancePts   = 100;   // Min distance between orders (points)
+// --- v3.2 ATR-adaptive grid spacing (opt-in; AtrSpacingMode=0 => fixed, 3.1-identical) ---
+input int             AtrSpacingMode      = 0;          // 0=OFF(fixed) 1=freeze-at-basket-open 2=live-per-bar
+input ENUM_TIMEFRAMES AtrTimeframe        = PERIOD_H1;  // TF for ATR measurement
+input int             AtrPeriod           = 14;         // ATR averaging period
+input double          StepAtrMult         = 0.30;       // effective StepPoints = ATR_points * this (mode>0)
+input double          MinOrderDistAtrMult = 0.25;       // effective MinOrderDistancePts = ATR_points * this (mode>0)
+input double          AtrSpacingFloorFrac = 0.25;       // clamp floor = this * fixed input value
+input double          AtrSpacingCeilFrac  = 4.0;        // clamp ceil  = this * fixed input value
 
 input string SecGatherProfits = "==== Gather Profits ====";
 //==================== PYRAMIDING ====================

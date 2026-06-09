@@ -31,6 +31,7 @@
 #include "Include/Orders.mqh"
 #include "Include/Slope.mqh"
 #include "Include/Regime.mqh"
+#include "Include/AtrSpacing.mqh"
 #include "Include/Pyramid.mqh"
 #include "Include/Series.mqh"
 #include "Include/Basket.mqh"
@@ -56,6 +57,9 @@ int OnInit()
 
    // regime gate (lazy iADX init in GetCurrentADX).
    if(!RegimeInit()) return(INIT_FAILED);
+
+   // v3.2 ATR-adaptive spacing handle (no-op when AtrSpacingMode==0).
+   AtrSpacingInit();
 
    // Load saved positions from previous session; verify against terminal.
    LoadPositionsFromFile();
@@ -92,6 +96,7 @@ void OnDeinit(const int reason)
 
    SlopeDeinit();
    RegimeDeinit();
+   AtrSpacingDeinit();
    CleanupDashboard();
 
    Print("MoneyDancer deinit, reason=", reason);
