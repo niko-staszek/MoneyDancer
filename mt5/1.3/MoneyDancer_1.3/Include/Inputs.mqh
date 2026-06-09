@@ -109,6 +109,7 @@ input double maxLot                = 0.0;   // Max Lot Size
 input int    MaxOrdersDir          = 50;    // Max Orders in one Direction
 input int    StepPoints            = 120;   // After X points let MOE run
 input int    MinOrderDistancePts   = 100;   // Min distance between orders (points)
+input bool   FoldManualOrders      = false;  // include hand-placed (magic==0) same-symbol orders in the basket
 
 input string __sec_gather_profits__ = "==== Gather Profits ====";
 //==================== PYRAMIDING ====================

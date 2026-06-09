@@ -40,11 +40,19 @@ double ClampLot(double lot)
 // These assume the caller has already done PositionSelectByTicket(ticket)
 // or is iterating PositionsTotal() + PositionGetTicket(i).
 
+// True if the currently-selected position is a hand-placed (magic==0) order on this symbol.
+bool IsManualPosition()
+{
+   return (PositionGetString(POSITION_SYMBOL) == _Symbol
+           && PositionGetInteger(POSITION_MAGIC) == 0);
+}
+
 bool IsMinePosition()
 {
    if(PositionGetString(POSITION_SYMBOL) != _Symbol) return false;
-   if(PositionGetInteger(POSITION_MAGIC) != (long)Magic) return false;
-   return true;
+   if(PositionGetInteger(POSITION_MAGIC) == (long)Magic) return true;
+   if(FoldManualOrders && PositionGetInteger(POSITION_MAGIC) == 0) return true;  // v1.3 fold
+   return false;
 }
 
 bool IsRunner()

@@ -18,7 +18,7 @@
 void ApplyBasketTPSeries(int dir, string seriesKey)
 {
    double be;
-   if(!CalcBasketBEWithCostsSeries(dir, seriesKey, be)) return;
+   if(!CalcBasketBEWithCostsSeries(dir, seriesKey, be, true)) return;   // v1.3: combined BE incl manual
 
    double tp = (dir > 0 ? be + bePoints * _Point : be - bePoints * _Point);
    tp = NormalizePrice(tp);
@@ -31,7 +31,7 @@ void ApplyBasketTPSeries(int dir, string seriesKey)
       if(!IsMinePosition()) continue;
       if(IsPyramidTicket(ticket)) continue;
       if(IsRunner()) continue;
-      if(!IsSelectedPositionInSeries(seriesKey)) continue;
+      if(!PositionInManagedSeries(seriesKey, dir)) continue;            // v1.3: set TP on manual order too
 
       long typ = PositionGetInteger(POSITION_TYPE);
       if(dir > 0 && typ != POSITION_TYPE_BUY)  continue;

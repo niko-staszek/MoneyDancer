@@ -48,6 +48,26 @@ int ExtractSeriesIdFromComment(string cmt, int dir)
    return (int)StringToInteger(num);
 }
 
+// Smallest series id with an open EA (magic==Magic) position in this direction; -1 if none.
+int LowestActiveSeriesId(int dir)
+{
+   int lowest = -1;
+   int total  = PositionsTotal();
+   for(int i = 0; i < total; i++)
+   {
+      ulong ticket = PositionGetTicket(i);
+      if(ticket == 0) continue;
+      if(PositionGetString(POSITION_SYMBOL) != _Symbol) continue;
+      if(PositionGetInteger(POSITION_MAGIC) != (long)Magic) continue;   // EA-owned only (never manual)
+      long typ = PositionGetInteger(POSITION_TYPE);
+      if(dir > 0 && typ != POSITION_TYPE_BUY)  continue;
+      if(dir < 0 && typ != POSITION_TYPE_SELL) continue;
+      int id = ExtractSeriesIdFromComment(PositionGetString(POSITION_COMMENT), dir);
+      if(id >= 0 && (lowest < 0 || id < lowest)) lowest = id;
+   }
+   return lowest;
+}
+
 //+------------------------------------------------------------------+
 //| Scan open positions; set active flags + advance series counters  |
 //| to the max id seen in comments. Restart-safe on EA reload.       |
@@ -124,6 +144,23 @@ bool IsSelectedPositionInSeries(string seriesKey)
 {
    if(seriesKey == "" || StringLen(seriesKey) == 0) return true;
    return (StringFind(PositionGetString(POSITION_COMMENT), seriesKey, 0) >= 0);
+}
+
+// Membership for series-scoped basket math, manual-aware. A magic==0 order (when FoldManualOrders)
+// is adopted into exactly ONE series: the lowest active series id of its direction.
+bool PositionInManagedSeries(string seriesKey, int dir)
+{
+   if(IsSelectedPositionInSeries(seriesKey)) return true;            // EA's own series member
+   if(FoldManualOrders && IsManualPosition())
+   {
+      long typ = PositionGetInteger(POSITION_TYPE);
+      if((dir > 0 && typ == POSITION_TYPE_BUY) || (dir < 0 && typ == POSITION_TYPE_SELL))
+      {
+         int low = LowestActiveSeriesId(dir);
+         if(low >= 0 && seriesKey == SeriesKey(dir, low)) return true;
+      }
+   }
+   return false;
 }
 
 //+------------------------------------------------------------------+

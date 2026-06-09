@@ -172,7 +172,7 @@ double ProfitAtPrice(long type, double lots, double openPrice, double closePrice
 //| Collect basket snapshot for a direction + series, sorted by      |
 //| openTime ascending.                                               |
 //+------------------------------------------------------------------+
-int CollectBasketPositionsSeries(int dir, string seriesKey, BasketPosition &outArr[])
+int CollectBasketPositionsSeries(int dir, string seriesKey, BasketPosition &outArr[], bool includeManual=false)
 {
    ArrayResize(outArr, 0);
    int n = 0;
@@ -185,7 +185,7 @@ int CollectBasketPositionsSeries(int dir, string seriesKey, BasketPosition &outA
       if(!IsMinePosition()) continue;
       if(IsPyramidTicket(ticket)) continue;
       if(IsRunner()) continue;
-      if(!IsSelectedPositionInSeries(seriesKey)) continue;
+      if(!(includeManual ? PositionInManagedSeries(seriesKey, dir) : IsSelectedPositionInSeries(seriesKey))) continue;
 
       long t = PositionGetInteger(POSITION_TYPE);
       if(dir > 0 && t != POSITION_TYPE_BUY)  continue;
@@ -243,10 +243,10 @@ double BasketProfitAtPriceSeries(BasketPosition &arr[], int n, double closePrice
 //| Cost-aware, series-scoped basket BE: solves price where total    |
 //| P&L (incl. swap) == 0. Uses bisection after finding a bracket.    |
 //+------------------------------------------------------------------+
-bool CalcBasketBEWithCostsSeries(int dir, string seriesKey, double &beOut)
+bool CalcBasketBEWithCostsSeries(int dir, string seriesKey, double &beOut, bool includeManual=false)
 {
    BasketPosition arr[];
-   int n = CollectBasketPositionsSeries(dir, seriesKey, arr);
+   int n = CollectBasketPositionsSeries(dir, seriesKey, arr, includeManual);
    if(n <= 0) return false;
 
    double cur = (dir > 0)
