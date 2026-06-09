@@ -387,6 +387,34 @@ After declaring backtest iteration exhausted, surfaced and addressed pre-live co
 
 **Backtest invariance**: all four pre-live features gated by `!MQLInfoInteger(MQL_TESTER)`. STEP backtest results unchanged. Verified via code review (no SUCCESS-path changes in trade.* wrappers).
 
+### 2026-05-24 — Phase 1/2/3: 3.0 naming refactor + S2.C.9 telemetry + S3.2c PYRAMID_ONLY (in-place under mt5/2.0)
+
+User chose to do the 4 deferred large items (naming refactor, S2.C.9 telemetry, S3.2c, remaining CR items) in-place under `mt5/2.0/` rather than cutting `mt5/3.0/` folder.
+
+**Phase 1 (commit `0c3ccf2`)**: 3.0 naming refactor.
+- 305 substitutions across 16 files (script: `scripts/_naming_refactor.py`)
+- 61 input renames: camelCase + PascalCase_underscore → PascalCase
+- 22 global renames: g_snake_case → g_camelCase
+- 3 shipped `.set` files migrated via `scripts/_rename_set_file.py`
+- CR comment cleanups: I6 (OnChartEvent), M5 (BE bisection step), M6 (OnTester), M11 (Webhook startup-hour)
+- Verification: compile clean (0/0); EA init log shows MD 2.0 init + 125 input parsing OK + trades fire. Strict bit-identical mar25 deferred due to terminal singleton collision.
+
+**Phase 2 (commit `57814f1`)**: S2.C.9 regime telemetry infrastructure.
+- New `Include/RegimeTrace.mqh`: tester-allowed per-trade CSV writer with cols `ts, event, ticket, dir, regime, slope, basket_id, lot, price`
+- New input `UseRegimeTrace` (default OFF) — backtest-invariant when off
+- Wired into `OpenPosition` via `RegimeTrace_LogOpen`
+- New analysis script `scripts/_s2c9_regime_breakdown.py`: joins per-cell trades.csv with regime trace, groups by (DOW × regime × hour), flags consistently-bad cells
+- Expected outcome per "iteration exhausted" finding: no flagged (DOW, regime, hour) combinations. Confirms path-dependence dominates even at fine-grained keys.
+
+**Phase 3 (in flight)**: S3.2c PYRAMID_ONLY enum value.
+- New `RegimeTrendMode=REGIME_TREND_PYRAMID_ONLY (2)` enum
+- New inputs: `RegimePyramidRange=200`, `RegimePyramidBEBufPts=50`, `RegimePyramidIgnoreSlope=true`
+- New helpers in `Regime.mqh`: `RegimePyramidEnabled()` + `RegimePyramidDir()`
+- `RegimeBlocksEntryDir()`: returns TRUE both dirs in PYRAMID_ONLY MMD-trend (grid blocked)
+- `PyramidWantsOrder()`: bypass legacy PyramRange/slope gates when auto-enabled
+- Sample test `PYR-5k-sep25` running (sep25 was -19.8% under WT — hypothesis: pyramid catches the trend better)
+- Decision rule: if sep25 improves (e.g., > 0% or -10%) AND apr25 monster non-regression → consider full sweep. Else document as designed-not-shipped.
+
 ### 2026-05-23 — Code review (full pass, agent + manual triage)
 
 Dispatched Plan agent to read all 22 files (~6.5k LOC) and report findings by severity. Agent produced 4 critical + 11 important + 12 minor + 4 style issues. Triaged + fixed in priority order:
