@@ -60,16 +60,18 @@ def _running(name):
     out = subprocess.run(["tasklist"], capture_output=True, text=True).stdout.lower()
     return name in out
 
-def reset_mt5(grace=60):
-    """Clean MT5 state before a run: kill terminal64, wait for metatester64 to exit
-    naturally (it may be finalizing a big report), force-kill only if stuck, then settle.
-    Killing a BUSY metatester breaks the agent pool, so we wait first."""
+def reset_mt5(grace=300):
+    """Clean MT5 state before a run. terminal64 is single-instance per data dir, so it
+    MUST be gone. metatester64 may be flushing a huge (100MB+) report/log after a heavy
+    run — killing it mid-flush jams the agent pool (every later launch instant-exits), so
+    we WAIT for it to vanish naturally (up to `grace`), only force-killing as a last resort."""
     subprocess.run(["taskkill", "//IM", "terminal64.exe", "//F"], capture_output=True)
-    for _ in range(max(1, grace // 3)):
-        if not _running("metatester64") and not _running("terminal64"):
-            break
-        time.sleep(3)
-    subprocess.run(["taskkill", "//IM", "metatester64.exe", "//F"], capture_output=True)
+    waited = 0
+    while _running("metatester64") and waited < grace:
+        time.sleep(5); waited += 5
+    if _running("metatester64"):                 # stuck past grace -> last-resort kill
+        subprocess.run(["taskkill", "//IM", "metatester64.exe", "//F"], capture_output=True)
+        time.sleep(10)
     time.sleep(5)
 
 def main():
@@ -86,8 +88,10 @@ def main():
             i += 1
             rid = f"BENCH-{sid}-{ym}"
             tcsv = ROOT / "runs" / rid / "trades.csv"
-            if (sid, ym) in done or tcsv.exists():
-                print(f"[{i}/{total}] SKIP {rid} (done)")
+            rep0 = ROOT / "runs" / rid / f"{rid}-report.htm"
+            # skip if the backtest already RAN (report exists) or already extracted — never re-run
+            if (sid, ym) in done or tcsv.exists() or (rep0.exists() and rep0.stat().st_size > 0):
+                print(f"[{i}/{total}] SKIP {rid} (already ran)")
                 continue
             setpath = PRESET_DIR / fname
             ov = []
