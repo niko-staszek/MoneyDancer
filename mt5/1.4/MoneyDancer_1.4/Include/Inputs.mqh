@@ -94,6 +94,14 @@ input int    strongTrendPts        = 60;     // Threshold for detecting strong d
 //==================== TRADING ====================
 input string __sec_orders_sl_tp__ = "==== Orders & SL & TP ====";
 input double LotsBase              = 0.01;  // Basic Order Size
+// --- v1.4 account-scaled position size (opt-in; AutoLotScaling=false => fixed LotsBase, 1.3-identical) ---
+enum AutoLotMetric { Metric_Equity, Metric_Balance };   // dropdown: Equity / Balance
+enum AutoLotCalc   { Calc_Add,      Calc_Multiply  };   // dropdown: Add / Multiply
+input bool          AutoLotScaling   = false;           // master on/off
+input AutoLotMetric AutoLotType      = Metric_Equity;   // scale by Equity (default) or Balance
+input AutoLotCalc   AutoLotMode      = Calc_Add;         // Add (default) or Multiply
+input double        AutoLotDivisor   = 1000;            // account units per step ("by how much")
+input double        AutoLotIncrement = 0.01;            // lot added per unit (Add mode only)
 input int    TP_Points             = 50;    // Take Profit for Basic Order
 input int    SL_Points             = 0;     // Stop Loss for Basic Order (MT4 original)
 input int    Slippage              = 10;    // Accepted slippage for price

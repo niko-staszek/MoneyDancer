@@ -36,6 +36,18 @@ double ClampLot(double lot)
    return lot;
 }
 
+// v1.4: base lot scaled to account size when AutoLotScaling is on; else the fixed LotsBase.
+double ComputeBaseLot()
+{
+   if(!AutoLotScaling) return LotsBase;                                  // OFF: exact 1.3 path
+   double metric = (AutoLotType == Metric_Balance) ? AccountInfoDouble(ACCOUNT_BALANCE)
+                                                    : AccountInfoDouble(ACCOUNT_EQUITY);
+   double units  = (AutoLotDivisor > 0.0) ? (metric / AutoLotDivisor) : 0.0;   // continuous; guard div0
+   double lot    = (AutoLotMode == Calc_Multiply) ? (LotsBase * units)
+                                                  : (LotsBase + AutoLotIncrement * units);
+   return ClampLot(lot);
+}
+
 //==================== POSITION OWNERSHIP HELPERS ====================
 // These assume the caller has already done PositionSelectByTicket(ticket)
 // or is iterating PositionsTotal() + PositionGetTicket(i).

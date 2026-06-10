@@ -199,8 +199,8 @@ bool SendOrder(int dir, double lots, bool useTP, int tpPoints, bool isRunner, st
          tp = (dir > 0 ? price + tpPoints * _Point : price - tpPoints * _Point);
    }
 
-   if(wantPyr)   lots = LotsBase;     // pyramid always uses basic lot
-   if(lots <= 0) lots = LotsBase;
+   if(wantPyr)   lots = ComputeBaseLot();     // pyramid always uses basic lot
+   if(lots <= 0) lots = ComputeBaseLot();
    lots = ClampLot(lots);
 
    string cmt = commentText;
@@ -253,7 +253,7 @@ void HandleSignal(int signalDir)
    if(!ScenarioD || cntNoRunners < startBe)
    {
       if(!CheckMinDistanceFromExistingPositions(signalDir)) return;
-      SendOrder(signalDir, LotsBase, true, TP_Points, false, seriesCmt);
+      SendOrder(signalDir, ComputeBaseLot(), true, TP_Points, false, seriesCmt);
       return;
    }
 
@@ -300,7 +300,7 @@ void HandleSignal(int signalDir)
    else
    {
       // Price is recovering toward BE — stick with basic lot.
-      lot  = ClampLot(LotsBase);
+      lot  = ClampLot(ComputeBaseLot());
       cmtD = seriesCmt + "|DB";
    }
 
