@@ -1,8 +1,5 @@
 //+------------------------------------------------------------------+
 //| Inputs.mqh — all input parameters                                |
-//| Phase A2: ported 1:1 from MT4 source. Same names, same defaults. |
-//| New Phase B inputs (IDLE rails, news, scalper toggle) added in   |
-//| Section 18 at the bottom.                                        |
 //+------------------------------------------------------------------+
 #ifndef __MD_INPUTS_MQH__
 #define __MD_INPUTS_MQH__
@@ -71,77 +68,77 @@ input int    FriEnd2_Minute          = 0;
 
 //==================== SIGNAL (Tick Burst) ====================
 input string __sec_ai_order_detection__ = "==== Order Detection ====";
-input double PriceStep             = 0.25;   // Price Range for Burst
-input int    BurstTicks            = 10;     // Detect TOE and Burst
-input int    MinMovePoints         = 20;     // Min. impact for price (points)
-input int    CooldownSec           = 45;     // Time Filter
-input int    MaxSpreadPts          = 45;     // Max Spread (points)
+input double PriceStep             = 0.25;   // Price range for burst detection
+input int    BurstTicks            = 10;     // Tick burst count to detect order entry
+input int    MinMovePoints         = 20;     // Minimum price move to qualify (points)
+input int    CooldownSec           = 45;     // Minimum seconds between signals
+input int    MaxSpreadPts          = 45;     // Maximum allowed spread (points)
 
 //==================== HYBRID MODE (LOW TICKRATE FALLBACK) ====================
-input bool   UseTickWindowFallback = true;   // Support for Burst Detection
-input int    TickRateLookbackSec   = 10;     // Check TOE in Zone
-input double TickRateThreshold     = 4.0;    // Min. TOE in Range
-input int    TickWindowTicks       = 25;     // Check next X Trades for TOE
+input bool   UseTickWindowFallback = true;   // Enable fallback for low-tick-rate environments
+input int    TickRateLookbackSec   = 10;     // Lookback window for tick-rate check (seconds)
+input double TickRateThreshold     = 4.0;    // Minimum tick rate to use burst mode
+input int    TickWindowTicks       = 25;     // Tick window size for fallback detection
 
 //==================== MA SLOPE FILTER ====================
 input string __sec_trend_filter__ = "==== Filter for Trend Detection ====";
-input bool   UseSlopeFilter        = true;   // Dynamic - Strength of Momentum
-input int    maPeriod              = 50;     // Dynamic Period
-input int    slopeLookbackBars     = 5;      // Min. sequences for Strength
-input int    slopeThresholdPts     = 20;     // Dynamic force threshold for direction confirmation
-input int    strongTrendPts        = 60;     // Threshold for detecting strong dynamics
+input bool   UseSlopeFilter        = true;   // Enable MA slope trend filter
+input int    maPeriod              = 50;     // MA period for slope calculation
+input int    slopeLookbackBars     = 5;      // Bars to look back for slope strength
+input int    slopeThresholdPts     = 20;     // Minimum slope to confirm trend direction (points)
+input int    strongTrendPts        = 60;     // Slope threshold to classify as strong trend (points)
 
 //==================== TRADING ====================
 input string __sec_orders_sl_tp__ = "==== Orders & SL & TP ====";
-input double LotsBase              = 0.01;  // Basic Order Size
+input double LotsBase              = 0.01;  // Base lot size for the first order
 // --- v1.4 account-scaled position size (opt-in; AutoLotScaling=false => fixed LotsBase, 1.3-identical) ---
 enum AutoLotMetric { Metric_Equity, Metric_Balance };   // dropdown: Equity / Balance
 enum AutoLotCalc   { Calc_Add,      Calc_Multiply  };   // dropdown: Add / Multiply
-input bool          AutoLotScaling   = false;           // master on/off
-input AutoLotMetric AutoLotType      = Metric_Equity;   // scale by Equity (default) or Balance
-input AutoLotCalc   AutoLotMode      = Calc_Add;         // Add (default) or Multiply
-input double        AutoLotDivisor   = 1000;            // account units per step ("by how much")
-input double        AutoLotIncrement = 0.01;            // lot added per unit (Add mode only)
-input int    TP_Points             = 50;    // Take Profit for Basic Order
-input int    SL_Points             = 0;     // Stop Loss for Basic Order (MT4 original)
-input int    Slippage              = 10;    // Accepted slippage for price
-input int    Magic                 = 21010; // Magic Number
+input bool          AutoLotScaling   = false;           // Enable automatic lot scaling by account size
+input AutoLotMetric AutoLotType      = Metric_Equity;   // Scale by Equity or Balance
+input AutoLotCalc   AutoLotMode      = Calc_Add;         // Lot scaling method: Add or Multiply
+input double        AutoLotDivisor   = 2000;            // Account units per 0.01 of base lot (with Add: ~0.5 base @100k)
+input double        AutoLotIncrement = 0.01;            // Lot increment per unit (Add mode only)
+input int    TP_Points             = 50;    // Take profit for the first order (points)
+input int    SL_Points             = 0;     // Stop loss for the first order, points (0=OFF)
+input int    Slippage              = 10;    // Maximum accepted slippage (points)
+input int    Magic                 = 21010; // Magic number for this EA instance
 
 //==================== SCENARIO D ====================
 input string __sec_higher_risk__ = "==== Higher Risk Mode for Orders ====";
-input bool   ScenarioD             = true;  // MoE for Exit
-input int    startBe               = 5;     // After X Trades find Exit
-input double lotMultiplier         = 1.50;  // Multiply Basic Order *X
-input int    bePoints              = 30;    // Breakeven for ALL (sell or buy) Orders
-input double maxLot                = 0.0;   // Max Lot Size
-input int    MaxOrdersDir          = 50;    // Max Orders in one Direction
-input int    StepPoints            = 120;   // After X points let MOE run
-input int    MinOrderDistancePts   = 100;   // Min distance between orders (points)
-input bool   FoldManualOrders      = false;  // include hand-placed (magic==0) same-symbol orders in the basket
+input bool   ScenarioD             = true;  // Enable Scenario D (martingale exit)
+input int    startBe               = 5;     // Number of orders before seeking breakeven exit
+input double lotMultiplier         = 1.50;  // Lot size multiplier per additional order
+input int    bePoints              = 30;    // Breakeven target for all open orders (points)
+input double maxLot                = 0.0;   // Maximum lot size per order (0=OFF)
+input int    MaxOrdersDir          = 50;    // Maximum orders in one direction
+input int    StepPoints            = 120;   // Minimum price move before adding next order (points)
+input int    MinOrderDistancePts   = 100;   // Minimum distance between orders (points)
+input bool   FoldManualOrders      = false;  // Manage hand-placed (magic 0) orders as part of the basket
 
 input string __sec_gather_profits__ = "==== Gather Profits ====";
 //==================== PYRAMIDING ====================
 // Minimal state: ticket, trigger, tp, sl, index. Pyramid is always single-direction.
 // TP distance is always TP_Points (same as basic orders).
-input int    PyramRange              = 0;     // Pyramiding Range (0=OFF, >0=ON)
-input int    PyramSlopeEmaPeriod     = 3;     // Dynamic Period
-input int    PyramSlopeLookbackBars  = 5;     // Min. sequences for Strength
-input double PyramSlopeAngleDeg      = 20.0;  // Angle threshold (deg)
-input int    PyramBEBufPts           = 0;     // Optional Breakeven buffer (points)
+input int    PyramRange              = 0;     // Pyramiding range, points (0=OFF)
+input int    PyramSlopeEmaPeriod     = 3;     // EMA period for pyramid slope filter
+input int    PyramSlopeLookbackBars  = 5;     // Bars to look back for pyramid slope strength
+input double PyramSlopeAngleDeg      = 20.0;  // Minimum slope angle to allow pyramiding (degrees)
+input int    PyramBEBufPts           = 0;     // Pyramid breakeven buffer (points)
 
 //==================== GUARDS ====================
 input string __sec_loss_control__ = "==== Set Loss Control ====";
-input double MaxBasketDD_Pct       = 55.0; // Max DD per basket -> hedge. Test it!
-input double MaxEquityDD_Pct       = 80.0; // Max DD across all trades -> hedge. Test it!
+input double MaxBasketDD_Pct       = 55.0; // Maximum drawdown per basket before hedge (%)
+input double MaxEquityDD_Pct       = 80.0; // Maximum drawdown across all trades before hedge (%)
 
-// S1.0 — per-basket equity SL rail (default OFF for 1.1 parity).
-input double MaxBasketLossPct      = 0.0;  // S1.0 % of equity at series open (0=OFF)
-input int    MaxBasketSLPerDay     = 2;    // S1.0 day pause after this many basket-SL triggers
+// Per-basket equity stop-loss rail
+input double MaxBasketLossPct      = 0.0;  // Per-basket equity stop-loss, % at series open (0=OFF)
+input int    MaxBasketSLPerDay     = 2;    // Pause for the day after this many basket stop-loss hits
 
-// S1.6 — all-time peak-to-trough DD trailing kill (default OFF).
-input double MaxAllTimeDDPct       = 0.0;  // S1.6 ceiling % (0=OFF; recommend 40)
+// All-time drawdown kill
+input double MaxAllTimeDDPct       = 0.0;  // All-time drawdown kill, % (0=OFF; try 40)
 
-// S3.2 — ADX regime gate (default OFF).
+// ADX regime gate
 enum ENUM_REGIME_MODE
 {
    REGIME_OFF  = 0,
@@ -156,26 +153,26 @@ input ENUM_TIMEFRAMES  RegimeTimeframe = PERIOD_M15;
 //==================== DAILY RISK LOCKS ====================
 input string __risk_sep__                 = "══════ DAILY RISK LOCKS ══════";
 // Max Daily Profit: enter 1..999 (1=1% increase in BALANCE relative to the baseline at 01:00); 0 = OFF
-input int    MaxDailyProfitPct            = 0;      // Daily Profit (0=OFF, 1..999=%)
-input int    DailyBaselineHour            = 1;      // Hour baseline (default 01:00)
-input int    DailyBaselineMinute          = 0;      // Minute baseline (default 00)
+input int    MaxDailyProfitPct            = 0;      // Daily profit cap (0=OFF, 1..999=%)
+input int    DailyBaselineHour            = 1;      // Baseline snapshot hour (default 01:00)
+input int    DailyBaselineMinute          = 0;      // Baseline snapshot minute (default 00)
 
 // After This Hour Close (protection of earned profits):
 // If, by the specified time (or after it) BALANCE - baseline >= AfterThisHourMinProfitUsd
 // and total FLOAT (open positions) >= AfterThisHourMaxFloatingLossUsd (eq. -10.0),
 // then the EA closes all positions and suspends trading until the next day.
-input int    AfterThisHourCloseHour       = -1;     // After this Hour Protect Profit (-1=OFF, 0..23=Hour)
-input int    AfterThisHourCloseMinute     = 0;      // After this Minute Protect Profit (default 00)
-input double AfterThisHourMinProfitUsd    = 0.0;    // Profit in USD, then Protect
-input double AfterThisHourMaxFloatingLossUsd = -10.0; // FLOAT in USD must be >= this value (eq. -10)
+input int    AfterThisHourCloseHour       = -1;     // Close and pause after this hour if profit met (-1=OFF)
+input int    AfterThisHourCloseMinute     = 0;      // Minute for the after-hours profit protection check
+input double AfterThisHourMinProfitUsd    = 0.0;    // Minimum profit in USD required to trigger protection
+input double AfterThisHourMaxFloatingLossUsd = -10.0; // Maximum allowed floating loss in USD at trigger time
 
 // Profit Lock After Time (uses daily baseline from DailyBaselineHour:DailyBaselineMinute):
 // If enabled: EA works normally until the lock time (UntilHour:UntilMinute).
 // At the lock time it snapshots today's profit (Balance - baseline). After that, EA will NOT allow giving back
 // that locked profit. If Equity drops below (baseline + lockedProfit) -> CloseAll + pause trading until next day.
-input bool   RiskFromCurrentProfit            = false; // Enable Profit Lock
-input int    RiskFromCurrentProfitUntilHour   = 13;    // Lock time - Hour (server time)
-input int    RiskFromCurrentProfitUntilMinute = 30;    // Lock time - Minute
+input bool   RiskFromCurrentProfit            = false; // Enable profit-lock after a set time
+input int    RiskFromCurrentProfitUntilHour   = 13;    // Lock time — hour (server time)
+input int    RiskFromCurrentProfitUntilMinute = 30;    // Lock time — minute
 
 //==================== TOTAL PROFIT TARGET (1.1) ====================
 // Stop trading once today's total P/L (realized + floating) hits the target.
@@ -187,13 +184,13 @@ enum ENUM_DAILY_TARGET_MODE
    DAILY_TARGET_PCT = 1,   // Percentage of baseline
    DAILY_TARGET_USD = 2    // Fixed USD amount
 };
-input ENUM_DAILY_TARGET_MODE DailyProfitTargetMode = DAILY_TARGET_OFF; // Profit Target Mode
-input double DailyProfitTargetPct = 5.0;    // Target as % of baseline (Mode=Percentage)
-input double DailyProfitTargetUsd = 100.0;  // Target as USD amount   (Mode=FixedUSD)
+input ENUM_DAILY_TARGET_MODE DailyProfitTargetMode = DAILY_TARGET_OFF; // Daily profit target mode
+input double DailyProfitTargetPct = 5.0;    // Profit target as % of daily baseline (Percentage mode)
+input double DailyProfitTargetUsd = 100.0;  // Profit target as fixed USD amount (FixedUSD mode)
 
 //==================== SCENARIO E ====================
 input string __sec_big_losses__ = "==== Helper for BIG LOSSES ====";
-input bool   ScenarioE             = false; // Test it! Active hedge!
+input bool   ScenarioE             = false; // Enable Scenario E (active hedge on large losses)
 input double HedgeRatio            = 0.35;
 input int    RunnerBE_StartPts     = 120;
 input int    RunnerTrailDistPts    = 200;
