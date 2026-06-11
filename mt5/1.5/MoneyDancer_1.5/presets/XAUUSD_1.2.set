@@ -100,9 +100,9 @@ RiskFromCurrentProfit=false
 RiskFromCurrentProfitUntilHour=14
 RiskFromCurrentProfitUntilMinute=30
 __profit_target_sep__======= TOTAL PROFIT TARGET ======
-ProfitTargetMode=0
-ProfitTargetPct=5.0
-ProfitTargetUsd=100.0
+DailyProfitTargetMode=0
+DailyProfitTargetPct=5.0
+DailyProfitTargetUsd=100.0
 __sec_big_losses__=====Helper for BIG LOSSES====
 ScenarioE=true
 HedgeRatio=0.35
