@@ -1,0 +1,14 @@
+73082a3b3e8f0523  75248  BENCH2-1.3a-2025-01_trades.csv
+12e84e6ee34df04c  88270  BENCH2-1.3a-2025-03_trades.csv
+6c72ba12cda16eaa  101991  BENCH2-1.3a-2025-04_trades.csv
+8c84a35bb957845a  84324  BENCH2-1.3a-2025-08_trades.csv
+1c9576b4521b205f  100099  BENCH2-1.3a-2025-09_trades.csv
+da30f4bc71380209  96176  BENCH2-1.3a-2025-10_trades.csv
+102b5c0fb28791fa  96852  BENCH2-1.3a-2025-11_trades.csv
+0ce5577a7e9cb9e1  73927  BENCH2-1.3a-2026-01_trades.csv
+2907794b2a8eb5a0  59806  BENCH2-1.3a-2026-02_trades.csv
+5f08841840896f3a  181318  BENCH2-1.3a-2026-03_trades.csv
+06d2728f7722002e  2426  XAUUSD_1.3a_2pct.set
+c7512bc7415c0ee6  608  manifest.md
+3b6b678cf2d67609  1857  result.md
+befa697334fa14e9  1224  results.csv
