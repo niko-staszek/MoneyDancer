@@ -176,15 +176,15 @@ void ApplyDailyRiskControls()
    }
 
    // 4) Total Profit Target (realized + floating) — 1.1
-   if(ProfitTargetMode != PROFIT_TARGET_OFF)
+   if(DailyProfitTargetMode != DAILY_TARGET_OFF)
    {
       double totalProfit = eq - g_dayBaseBalance;   // equity already includes float
       double targetUsd   = 0.0;
 
-      if(ProfitTargetMode == PROFIT_TARGET_PCT && ProfitTargetPct > 0.0)
-         targetUsd = g_dayBaseBalance * (ProfitTargetPct / 100.0);
-      else if(ProfitTargetMode == PROFIT_TARGET_USD && ProfitTargetUsd > 0.0)
-         targetUsd = ProfitTargetUsd;
+      if(DailyProfitTargetMode == DAILY_TARGET_PCT && DailyProfitTargetPct > 0.0)
+         targetUsd = g_dayBaseBalance * (DailyProfitTargetPct / 100.0);
+      else if(DailyProfitTargetMode == DAILY_TARGET_USD && DailyProfitTargetUsd > 0.0)
+         targetUsd = DailyProfitTargetUsd;
 
       if(targetUsd > 0.0 && totalProfit >= targetUsd)
       {

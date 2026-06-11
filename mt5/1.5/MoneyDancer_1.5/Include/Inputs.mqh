@@ -181,15 +181,15 @@ input int    RiskFromCurrentProfitUntilMinute = 30;    // Lock time - Minute
 // Stop trading once today's total P/L (realized + floating) hits the target.
 // Daily reset: pauses until next server-time 00:00, like the other daily locks.
 input string __profit_target_sep__       = "══════ TOTAL PROFIT TARGET ══════";
-enum ENUM_PROFIT_TARGET_MODE
+enum ENUM_DAILY_TARGET_MODE
 {
-   PROFIT_TARGET_OFF = 0,   // Off
-   PROFIT_TARGET_PCT = 1,   // Percentage of baseline
-   PROFIT_TARGET_USD = 2    // Fixed USD amount
+   DAILY_TARGET_OFF = 0,   // Off
+   DAILY_TARGET_PCT = 1,   // Percentage of baseline
+   DAILY_TARGET_USD = 2    // Fixed USD amount
 };
-input ENUM_PROFIT_TARGET_MODE ProfitTargetMode = PROFIT_TARGET_OFF; // Profit Target Mode
-input double ProfitTargetPct = 5.0;    // Target as % of baseline (Mode=Percentage)
-input double ProfitTargetUsd = 100.0;  // Target as USD amount   (Mode=FixedUSD)
+input ENUM_DAILY_TARGET_MODE DailyProfitTargetMode = DAILY_TARGET_OFF; // Profit Target Mode
+input double DailyProfitTargetPct = 5.0;    // Target as % of baseline (Mode=Percentage)
+input double DailyProfitTargetUsd = 100.0;  // Target as USD amount   (Mode=FixedUSD)
 
 //==================== SCENARIO E ====================
 input string __sec_big_losses__ = "==== Helper for BIG LOSSES ====";
